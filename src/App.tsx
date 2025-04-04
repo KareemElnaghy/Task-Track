@@ -11,11 +11,36 @@ function App() {
     setOSName(await invoke("os_name"));
   }
 
-  async function getProcessesList(){
-    
+  async function getProcessesList() {
     const processes = await invoke("get_processes");
     setProcesses(processes);
   }
+
+  async function handleKill(pid) {
+    await invoke("kill_process", { pid });
+    getProcessesList();
+  }
+  async function handleSuspend(pid) {
+    await invoke("suspend_process", { pid });
+    getProcessesList();
+  }
+  async function handleResume(pid) {
+    await invoke("resume_process", { pid });
+    getProcessesList();
+  }
+  // Actions on all processes
+  // async function handleSuspendAll() {
+  //   await invoke("suspend_all_processes");
+  //   getProcessesList();
+  // }
+  // async function handleKillAll() {
+  //   await invoke("kill_all_processes");
+  //   getProcessesList();
+  // }
+  // async function handleResumeAll() {
+  //   await invoke("resume_all_processes");
+  //   getProcessesList();
+  // }
 
   return (
     <main className="container">
@@ -29,20 +54,51 @@ function App() {
           getProcessesList();
         }}
       >
-        <button type="submit">Yalla</button>
+        <button className="start">Yalla</button>
       </form>
-      <p>{osName}</p>
+      <p className="os-name">Operating System: {osName}</p>
+
       <div className="processes">
         <h2>Processes</h2>
-        <ul>
-          {processes.map((process) => (
-            <li key={process.pid}>
-              <p>{process.name}</p>
-              <p>{process.pid}</p>
-              <p>{process.status}</p>
-            </li>
-          ))}
-        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {processes.map((process) => (
+              <tr key={process.pid}>
+                <td>{process.pid}</td>
+                <td>{process.name}</td>
+                <td>{process.status}</td>
+                <td>
+                  <button
+                    className="kill"
+                    onClick={() => handleKill(process.pid)}
+                  >
+                    Kill
+                  </button>
+                  <button
+                    className="suspend"
+                    onClick={() => handleSuspend(process.pid)}
+                  >
+                    Suspend
+                  </button>
+                  <button
+                    className="resume"
+                    onClick={() => handleResume(process.pid)}
+                  >
+                    Resume
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </main>
   );
