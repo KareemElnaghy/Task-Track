@@ -51,6 +51,12 @@ td {
 th {
   background-color: #563b5a;
 }
+/* Sticky header */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
 
 tbody tr:nth-child(even) {
   background-color: #342537;
@@ -88,4 +94,25 @@ button.resume {
 
 button:hover {
   border: 2px solid #ab6beb;
+}
+/*tabs*/
+.tabs {
+  display: flex;
+  background-color: #312939;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.tab:hover {
+  background-color: #e0e0e0;
+}
+
+.tab.active {
+  background-color: #e0bbf0;
+  border-bottom: 3px solid #ab6beb;
 }
