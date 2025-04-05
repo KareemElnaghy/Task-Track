@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { TbReload } from "react-icons/tb";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
@@ -16,17 +17,28 @@ function App() {
   const [hasFetched, setHasFetched] = useState(false);
   const [activeTab, setActiveTab] = useState("processes");
   const [searchQuery, setSearchQuery] = useState("");
+  // AUTO REFRESH of processes every 1 second
+  useEffect(() => {
+    if (activeTab === "processes") {
+      const interval = setInterval(() => {
+        getOsName();
+        getProcessesList();
+        setActiveTab("processes");
+        setSearchQuery("");
+      }, 1000); // 1000ms = 1 seconds
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [activeTab]);
 
   async function getOsName() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setOSName(await invoke("os_name"));
   }
-
   async function getProcessesList() {
     const processes = await invoke<Process[]>("get_processes");
     setProcesses(processes);
   }
-
   async function handleKill(pid: string) {
     await invoke("kill_process", { pid });
     getProcessesList();
