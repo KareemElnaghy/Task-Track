@@ -24,7 +24,6 @@ function App() {
         getOsName();
         getProcessesList();
         setActiveTab("processes");
-        setSearchQuery("");
       }, 1000); // 1000ms = 1 seconds
 
       return () => clearInterval(interval); // Cleanup on unmount
@@ -164,9 +163,9 @@ function App() {
                     <tr key={process.pid}>
                       <td>{process.pid}</td>
                       <td>{process.name}</td>
-                      <td>{process.status}</td>
                       <td>{process.cpu_usage}</td>
                       <td>{process.mem}</td>
+                      <td>{process.status}</td>
                       <td>
                         <button
                           className="kill"
