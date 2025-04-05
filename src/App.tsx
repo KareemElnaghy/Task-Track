@@ -4,13 +4,18 @@ import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
 function App() {
+  interface Process {
+    pid: string;
+    name: string;
+    status: string;
+    cpu_usage: string;
+    mem: string;
+  }
   const [osName, setOSName] = useState("");
-  const [processes, setProcesses] = useState([]);
+  const [processes, setProcesses] = useState<Process[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const [activeTab, setActiveTab] = useState("processes");
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function getOsName() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -18,43 +23,30 @@ function App() {
   }
 
   async function getProcessesList() {
-    const processes = await invoke("get_processes");
+    const processes = await invoke<Process[]>("get_processes");
     setProcesses(processes);
   }
 
-  async function handleKill(pid) {
+  async function handleKill(pid: string) {
     await invoke("kill_process", { pid });
     getProcessesList();
   }
-  async function handleSuspend(pid) {
+  async function handleSuspend(pid: string) {
     await invoke("suspend_process", { pid });
     getProcessesList();
   }
-  async function handleResume(pid) {
+  async function handleResume(pid: string) {
     await invoke("resume_process", { pid });
     getProcessesList();
   }
-  // async function handleTabClick(tab) {
-  //   setActiveTab(tab);
-  //   if (tab === "resources") {
-  //     //show Monitoring resources window
-  //   }
-  // }
-
-  // Actions on all processes
-  // async function handleSuspendAll() {
-  //   await invoke("suspend_all_processes");
-  //   getProcessesList();
-  // }
-  // async function handleKillAll() {
-  //   await invoke("kill_all_processes");
-  //   getProcessesList();
-  // }
-  // async function handleResumeAll() {
-  //   await invoke("resume_all_processes");
-  //   getProcessesList();
-  // }
-
+  async function handleTabClick(tab: "processes" | "resources") {
+    setActiveTab(tab);
+    if (tab === "resources") {
+      setProcesses([]);
+    } else if (tab === "processes") {
+      getProcessesList();
+    }
+  }
   return (
     <main className="container">
       {!hasFetched ? (
@@ -80,6 +72,8 @@ function App() {
             onClick={() => {
               getOsName();
               getProcessesList();
+              setActiveTab("processes");
+              setSearchQuery("");
             }}
           >
             <TbReload />
@@ -87,6 +81,7 @@ function App() {
         </div>
       )}
       <p className="os-name">Operating System: {osName}</p>
+      {/* Tabs*/}
       <div className="tabs">
         <div
           className={`tab ${activeTab === "processes" ? "active" : ""}`}
@@ -100,49 +95,93 @@ function App() {
         >
           Resources
         </div>
-        {/* Add more tabs as needed */}
+        {/* add more tabs here */}
       </div>
-      <div className="processes">
-        <table>
-          <thead>
-            <tr>
-              <th>PID</th>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {processes.map((process) => (
-              <tr key={process.pid}>
-                <td>{process.pid}</td>
-                <td>{process.name}</td>
-                <td>{process.status}</td>
-                <td>
-                  <button
-                    className="kill"
-                    onClick={() => handleKill(process.pid)}
-                  >
-                    Kill
-                  </button>
-                  <button
-                    className="suspend"
-                    onClick={() => handleSuspend(process.pid)}
-                  >
-                    Suspend
-                  </button>
-                  <button
-                    className="resume"
-                    onClick={() => handleResume(process.pid)}
-                  >
-                    Resume
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Resources TAB */}
+      {activeTab === "resources" && (
+        <div className="resources">
+          <div className="resource-row">
+            <p>CPU Usage:</p>
+            <div className="resource-box">[CPU Graph]</div>
+          </div>
+          <div className="resource-row">
+            <p>Memory Usage:</p>
+            <div className="resource-box">[Memory Graph]</div>
+          </div>
+          <div className="resource-row">
+            <p>Disk Usage:</p>
+            <div className="resource-box">[Disk Graph]</div>
+          </div>
+        </div>
+      )}
+      {/* Processes TAB */}
+      {activeTab === "processes" && (
+        <>
+          {/* Search bar */}
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search by name or PID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <div className="processes">
+            <table>
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>Name</th>
+                  <th>CPU%</th>
+                  <th>Memory</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {processes
+                  .filter(
+                    (process) =>
+                      process.name
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                      process.pid.toString().includes(searchQuery)
+                  )
+                  .map((process) => (
+                    <tr key={process.pid}>
+                      <td>{process.pid}</td>
+                      <td>{process.name}</td>
+                      <td>{process.status}</td>
+                      <td>{process.cpu_usage}</td>
+                      <td>{process.mem}</td>
+                      <td>
+                        <button
+                          className="kill"
+                          onClick={() => handleKill(process.pid)}
+                        >
+                          Kill
+                        </button>
+                        <button
+                          className="suspend"
+                          onClick={() => handleSuspend(process.pid)}
+                        >
+                          Suspend
+                        </button>
+                        <button
+                          className="resume"
+                          onClick={() => handleResume(process.pid)}
+                        >
+                          Resume
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </main>
   );
 }

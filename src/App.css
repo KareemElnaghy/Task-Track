@@ -65,6 +65,18 @@ tbody tr:nth-child(even) {
 tbody tr:nth-child(odd) {
   background-color: #422d48;
 }
+/* search bar */
+.search-bar {
+  margin: 1rem 0;
+}
+
+.search-input {
+  width: 98%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
 
 /* Buttons */
 button {
@@ -115,4 +127,33 @@ button:hover {
 .tab.active {
   background-color: #e0bbf0;
   border-bottom: 3px solid #ab6beb;
+}
+
+/* resource tab */
+.resources {
+  padding: 1rem;
+  background-color: #422d48;
+}
+
+.resource-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.resource-row p {
+  width: 150px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.resource-box {
+  flex-grow: 1;
+  height: 180px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
 }
