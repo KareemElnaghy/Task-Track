@@ -2,14 +2,14 @@
 use serde::{Serialize, Deserialize};
 use sysinfo::{System, Pid};
     // , ProcessExt, SystemExt};
-use std::process::Command;
+use std::{os::unix::process, process::Command};
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
     pid: u32,
     name: String,   //TODO: add more fields to this struct
     status: String,
-    // cpu_usage: f32,
+    cpu_usage: f32,
     // mem_usage: f32,
 }
 
@@ -24,18 +24,22 @@ fn get_processes() -> Vec<ProcessInfo> {
     let mut sys = System::new_all();
     sys.refresh_all(); 
 
-    sys.processes() // TODO: Retrieve Other fields
+    let mut processes: Vec<ProcessInfo> = sys.processes()
         .iter()
         .map(|(pid, process)| {
             ProcessInfo {
                 pid: pid.as_u32(),
                 name: process.name().to_string_lossy().into_owned(),
                 status: process.status().to_string(), 
-                // cpu_usage: process.cpu_usage(),
+                cpu_usage: process.cpu_usage(),
                 // mem_usage: process.memory()
             }
         })
-        .collect()
+        .collect();
+
+    processes.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    processes // Sort processes by name
+
 }
 
 #[tauri::command]
