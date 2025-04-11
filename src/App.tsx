@@ -11,7 +11,7 @@ function App() {
     name: string;
     status: string;
     cpu_usage: string;
-    mem: string;
+    mem_usage: string;
   }
   const [osName, setOSName] = useState("");
   const [processes, setProcesses] = useState<Process[]>([]);
@@ -19,8 +19,8 @@ function App() {
   const [activeTab, setActiveTab] = useState("processes");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [sortBy, setSortBy] = useState<string>("name");
-  const [sortDirection, setSortDirection] = useState<string>("ascending");
+  const [sortBy, setSortBy] = useState<string>("cpu_usage");
+  const [sortDirection, setSortDirection] = useState<string>("descending");
 
 
   // AUTO REFRESH of processes every 1 second
@@ -185,14 +185,12 @@ function App() {
                     Name {renderSortIndicator("name")}
                   </th>
                   <th onClick={() => handleSort("cpu_usage")} className="sortable-header">
-                    CPU%
+                    CPU % {renderSortIndicator("cpu_usage")}
                   </th>
-                  <th onClick={() => handleSort("memory")} className="sortable-header">
-                    Memory
+                  <th onClick={() => handleSort("mem_usage")} className="sortable-header">
+                    Mem % {renderSortIndicator("mem_usage")}
                   </th>
-                  <th onClick={() => handleSort("status")} className="sortable-header">
-                    Status
-                  </th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -210,7 +208,7 @@ function App() {
                       <td>{process.pid}</td>
                       <td>{process.name}</td>
                       <td>{process.cpu_usage}</td>
-                      <td>{process.mem}</td>
+                      <td>{process.mem_usage}</td>
                       <td>{process.status}</td>
                       <td>
                         <button

@@ -10,7 +10,7 @@ struct ProcessInfo { // struct to hold process information
     name: String,   //TODO: add more fields to this struct
     status: String,
     cpu_usage: f32, // TODO: add CPU usage
-    // mem_usage: f32,
+    mem_usage: f32,
 }
 
 #[tauri::command]
@@ -21,29 +21,36 @@ fn os_name() -> String {
 
 #[tauri::command]
 fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo> {
-    println!("Sorting by: {:?}, Direction: {:?}", sort_by, direction);
-    let mut sys = System::new_all();
-    sys.refresh_all(); 
 
-    // Collect processes into a vector
+    let mut sys = System::new_all();
+    
+    sys.refresh_all();
+    
+    std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+    sys.refresh_all();
+
     let mut processes: Vec<ProcessInfo> = sys.processes()
         .iter()
         .map(|(pid, process)| {
+            let cpu = (process.cpu_usage()*100.0).round() / 100.0;
+            let process_memory = process.memory();
+            let total_memory = sys.total_memory();
+            let mut mem = (process_memory as f32 / total_memory as f32) * 100.0;
+            mem = (mem * 100.0).round() / 100.0;
+
             ProcessInfo {
                 pid: pid.as_u32(),
                 name: process.name().to_string_lossy().into_owned(),
                 status: process.status().to_string(), 
-                cpu_usage: process.cpu_usage(),
-                // mem_usage: process.memory()
+                cpu_usage: cpu,
+                mem_usage: mem,
             }
         })
         .collect();
 
-
     let is_ascending = direction.unwrap_or_else(|| "ascending".to_string()) == "ascending";
     
-
-    match sort_by.as_str() { // sort processes based on the specified attribute
+    match sort_by.as_str() {
         "name" => {
             if is_ascending {
                 processes.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
@@ -58,23 +65,22 @@ fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo>
                 processes.sort_by(|a, b| b.pid.cmp(&a.pid));
             }
         }
-        // "cpu_usage" => {
-        //     if is_ascending {
-        //         processes.sort_by(|a, b| a.cpu_usage.partial_cmp(&b.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
-        //     } else {
-        //         processes.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
-        //     }
-        // }
-        // "status" => {
-        //     if is_ascending {
-        //         processes.sort_by(|a, b| a.status.cmp(&b.status));
-        //     } else {
-        //         processes.sort_by(|a, b| b.status.cmp(&a.status));
-        //     }
-        // }
+        "cpu_usage" => {
+            if is_ascending {
+                processes.sort_by(|a, b| a.cpu_usage.partial_cmp(&b.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
+            } else {
+                processes.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap_or(std::cmp::Ordering::Equal));
+            }
+        }
+        "mem_usage" => {
+            if is_ascending {
+                processes.sort_by(|a, b| a.mem_usage.partial_cmp(&b.mem_usage).unwrap_or(std::cmp::Ordering::Equal));
+            } else {
+                processes.sort_by(|a, b| b.mem_usage.partial_cmp(&a.mem_usage).unwrap_or(std::cmp::Ordering::Equal));
+            }
+        }
         _ => {
-            // Default to name ascending for any unrecognized sort attribute
-            processes.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+            processes.sort_by(|a,b| a.pid.cmp(&b.pid));
         }
     }
 
