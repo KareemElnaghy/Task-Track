@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { TbReload } from "react-icons/tb";
 import { invoke } from "@tauri-apps/api/core";
+import { TbSortAscending, TbSortDescending } from "react-icons/tb";
 import "./App.css";
 
 function App() {
@@ -17,6 +18,11 @@ function App() {
   const [hasFetched, setHasFetched] = useState(false);
   const [activeTab, setActiveTab] = useState("processes");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [sortBy, setSortBy] = useState<string>("name");
+  const [sortDirection, setSortDirection] = useState<string>("ascending");
+
+
   // AUTO REFRESH of processes every 1 second
   useEffect(() => {
     if (activeTab === "processes") {
@@ -28,14 +34,14 @@ function App() {
 
       return () => clearInterval(interval); // Cleanup on unmount
     }
-  }, [activeTab]);
+  }, [activeTab, sortBy, sortDirection]);
 
   async function getOsName() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setOSName(await invoke("os_name"));
   }
   async function getProcessesList() {
-    const processes = await invoke<Process[]>("get_processes");
+    const processes = await invoke<Process[]>("get_processes", {sortBy: sortBy, direction: sortDirection});
     setProcesses(processes);
   }
   async function handleKill(pid: string) {
@@ -58,6 +64,36 @@ function App() {
       getProcessesList();
     }
   }
+  function handleSort(column: string) {
+    console.log(`Sorting by column: ${column}`);
+    
+    if (sortBy === column) {
+      // Toggle direction if clicking the same column
+      const newDirection = sortDirection === "ascending" ? "descending" : "ascending";
+      console.log(`Toggling direction to: ${newDirection}`);
+      setSortDirection(newDirection);
+    } else {
+
+      console.log(`Changing sort column from ${sortBy} to ${column}`);
+      setSortBy(column);
+      setSortDirection("ascending");
+    }
+    
+    setTimeout(() => {
+      getProcessesList();
+    }, 0);
+  }
+  
+
+  function renderSortIndicator(column: string) {
+    if (sortBy === column) {
+      return sortDirection === "ascending" ? 
+        <TbSortAscending className="sort-icon" /> : 
+        <TbSortDescending className="sort-icon" />;
+    }
+    return null;
+  }
+
   return (
     <main className="container">
       {!hasFetched ? (
@@ -142,11 +178,21 @@ function App() {
             <table>
               <thead>
                 <tr>
-                  <th>PID</th>
-                  <th>Name</th>
-                  <th>CPU%</th>
-                  <th>Memory</th>
-                  <th>Status</th>
+                  <th onClick={() => handleSort("pid")} className="sortable-header">
+                    PID {renderSortIndicator("pid")}
+                  </th>
+                  <th onClick={() => handleSort("name")} className="sortable-header">
+                    Name {renderSortIndicator("name")}
+                  </th>
+                  <th onClick={() => handleSort("cpu_usage")} className="sortable-header">
+                    CPU%
+                  </th>
+                  <th onClick={() => handleSort("memory")} className="sortable-header">
+                    Memory
+                  </th>
+                  <th onClick={() => handleSort("status")} className="sortable-header">
+                    Status
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
