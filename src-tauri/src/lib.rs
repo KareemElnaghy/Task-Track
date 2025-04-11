@@ -1,16 +1,59 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use serde::{Serialize, Deserialize};
 use sysinfo::{System, Pid};
-    // , ProcessExt, SystemExt};
-use std::{process::Command};
+use std::process::Command;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use once_cell::sync::Lazy;
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
     pid: u32,
     name: String,   //TODO: add more fields to this struct
     status: String,
-    cpu_usage: f32, // TODO: add CPU usage
+    cpu_usage: f32, 
     mem_usage: f32,
+    username: String,
+}
+
+// cache for usernames
+static USERNAME_CACHE: Lazy<Arc<Mutex<HashMap<String, String>>>> = 
+    Lazy::new(|| Arc::new(Mutex::new(HashMap::new())));
+
+fn get_username_for_pid(pid: u32) -> String {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    {
+        let uid_key = format!("pid_{}", pid);
+        
+        // try to get from cache
+        {
+            let cache = USERNAME_CACHE.lock().unwrap();
+            if let Some(username) = cache.get(&uid_key) {
+                return username.clone();
+            }
+        }
+        
+        // if not in cache, look it up
+        let output = Command::new("ps")
+            .args(&["-o", "user=", "-p", &pid.to_string()])
+            .output();
+        
+        let username = match output {
+            Ok(output) if output.status.success() => {
+                String::from_utf8_lossy(&output.stdout).trim().to_string()
+            },
+            _ => "Unknown".to_string()
+        };
+        
+        // Store in cache
+        {
+            let mut cache = USERNAME_CACHE.lock().unwrap();
+            cache.insert(uid_key, username.clone());
+        }
+        
+        username
+    }
+    
 }
 
 #[tauri::command]
@@ -23,7 +66,6 @@ fn os_name() -> String {
 fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo> {
 
     let mut sys = System::new_all();
-    
     sys.refresh_all();
     
     std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
@@ -38,12 +80,18 @@ fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo>
             let mut mem = (process_memory as f32 / total_memory as f32) * 100.0;
             mem = (mem * 100.0).round() / 100.0;
 
+
+
+            let user = get_username_for_pid(pid.as_u32());
+
+
             ProcessInfo {
                 pid: pid.as_u32(),
                 name: process.name().to_string_lossy().into_owned(),
                 status: process.status().to_string(), 
                 cpu_usage: cpu,
-                mem_usage: mem,
+                mem_usage: mem, // TODO: Memory Usage as percentage or in bytes?
+                username: user,
             }
         })
         .collect();
