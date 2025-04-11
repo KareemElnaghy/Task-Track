@@ -3,6 +3,7 @@ body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
+  background-color: lavender;
 }
 
 .container {
@@ -68,6 +69,7 @@ tbody tr:nth-child(odd) {
 /* search bar */
 .search-bar {
   margin: 1rem 0;
+  background-color: #fffef1;
 }
 
 .search-input {

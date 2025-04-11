@@ -12,6 +12,7 @@ function App() {
     status: string;
     cpu_usage: string;
     mem_usage: string;
+    username: string;
   }
   const [osName, setOSName] = useState("");
   const [processes, setProcesses] = useState<Process[]>([]);
@@ -98,8 +99,6 @@ function App() {
     <main className="container">
       {!hasFetched ? (
         <>
-          <h1>Getting OS Name</h1>
-
           <form
             className="row"
             onSubmit={(e) => {
@@ -109,7 +108,6 @@ function App() {
               setHasFetched(true);
             }}
           >
-            <button className="start">Yalla</button>
           </form>
         </>
       ) : (
@@ -190,6 +188,7 @@ function App() {
                   <th onClick={() => handleSort("mem_usage")} className="sortable-header">
                     Mem % {renderSortIndicator("mem_usage")}
                   </th>
+                  <th>User</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -209,6 +208,7 @@ function App() {
                       <td>{process.name}</td>
                       <td>{process.cpu_usage}</td>
                       <td>{process.mem_usage}</td>
+                      <td>{process.username}</td>
                       <td>{process.status}</td>
                       <td>
                         <button
