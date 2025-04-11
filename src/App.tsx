@@ -38,7 +38,6 @@ function App() {
   }, [activeTab, sortBy, sortDirection]);
 
   async function getOsName() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setOSName(await invoke("os_name"));
   }
   async function getProcessesList() {
@@ -140,7 +139,7 @@ function App() {
         >
           Resources
         </div>
-        {/* add more tabs here */}
+        {/* TODO: add more tabs here */}
       </div>
       {/* Resources TAB */}
       {activeTab === "resources" && (
@@ -172,7 +171,8 @@ function App() {
               className="search-input"
             />
           </div>
-          <div className="processes">
+          <div className="processes"> 
+            {/* Sorting Click */}
             <table>
               <thead>
                 <tr>
@@ -188,7 +188,9 @@ function App() {
                   <th onClick={() => handleSort("mem_usage")} className="sortable-header">
                     Mem % {renderSortIndicator("mem_usage")}
                   </th>
-                  <th>User</th>
+                  <th onClick={() => handleSort("username")} className="sortable-header">
+                    User {renderSortIndicator("username")}
+                  </th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>

@@ -127,6 +127,13 @@ fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo>
                 processes.sort_by(|a, b| b.mem_usage.partial_cmp(&a.mem_usage).unwrap_or(std::cmp::Ordering::Equal));
             }
         }
+        "username" => {
+            if is_ascending {
+                processes.sort_by(|a, b| a.username.to_lowercase().cmp(&b.username.to_lowercase()));
+            } else {
+                processes.sort_by(|a, b| b.username.to_lowercase().cmp(&a.username.to_lowercase()));
+            }
+        }
         _ => {
             processes.sort_by(|a,b| a.pid.cmp(&b.pid));
         }
