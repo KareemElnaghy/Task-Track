@@ -1,246 +1,79 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { TbReload } from "react-icons/tb";
+import { useState, useEffect } from "react";
+import { HashRouter, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
-import { TbSortAscending, TbSortDescending } from "react-icons/tb";
+import { TbReload } from "react-icons/tb";
+import ProcessesView from "./ProcessesView";
+import ResourcesView from "./ResourcesView";
 import "./App.css";
 
-function App() {
-  interface Process {
-    pid: string;
-    name: string;
-    status: string;
-    cpu_usage: string;
-    mem_usage: string;
-    username: string;
-  }
+const Navigation = () => {
+  const location = useLocation();
+  return (
+    <div className="tabs">
+      <Link 
+        to="/processes" 
+        className={`tab ${location.pathname === '/processes' ? 'active' : ''}`}
+      >
+        Processes
+      </Link>
+      <Link 
+        to="/resources" 
+        className={`tab ${location.pathname === '/resources' ? 'active' : ''}`}
+      >
+        Resources
+      </Link>
+    </div>
+  );
+};
+
+export default function App() {
   const [osName, setOSName] = useState("");
-  const [processes, setProcesses] = useState<Process[]>([]);
-  const [hasFetched, setHasFetched] = useState(false);
-  const [activeTab, setActiveTab] = useState("processes");
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const [sortBy, setSortBy] = useState<string>("cpu_usage");
-  const [sortDirection, setSortDirection] = useState<string>("descending");
-
-
-  // AUTO REFRESH of processes every 1 second
+  // Fetch OS name on component mount
   useEffect(() => {
-    if (activeTab === "processes") {
-      const interval = setInterval(() => {
-        getOsName();
-        getProcessesList();
-        setActiveTab("processes");
-      }, 1000); // 1000ms = 1 seconds
-
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, [activeTab, sortBy, sortDirection]);
-
-  async function getOsName() {
-    setOSName(await invoke("os_name"));
-  }
-  async function getProcessesList() {
-    const processes = await invoke<Process[]>("get_processes", {sortBy: sortBy, direction: sortDirection});
-    setProcesses(processes);
-  }
-  async function handleKill(pid: string) {
-    await invoke("kill_process", { pid });
-    getProcessesList();
-  }
-  async function handleSuspend(pid: string) {
-    await invoke("suspend_process", { pid });
-    getProcessesList();
-  }
-  async function handleResume(pid: string) {
-    await invoke("resume_process", { pid });
-    getProcessesList();
-  }
-  async function handleTabClick(tab: "processes" | "resources") {
-    setActiveTab(tab);
-    if (tab === "resources") {
-      setProcesses([]);
-    } else if (tab === "processes") {
-      getProcessesList();
-    }
-  }
-  function handleSort(column: string) {
-    console.log(`Sorting by column: ${column}`);
+    const fetchOsName = async () => {
+      try {
+        const name = await invoke<string>("os_name");
+        setOSName(name);
+      } catch (error) {
+        console.error("Error fetching OS name:", error);
+        setOSName("Unknown OS");
+      }
+    };
     
-    if (sortBy === column) {
-      // Toggle direction if clicking the same column
-      const newDirection = sortDirection === "ascending" ? "descending" : "ascending";
-      console.log(`Toggling direction to: ${newDirection}`);
-      setSortDirection(newDirection);
-    } else {
-
-      console.log(`Changing sort column from ${sortBy} to ${column}`);
-      setSortBy(column);
-      setSortDirection("ascending");
-    }
-    
-    setTimeout(() => {
-      getProcessesList();
-    }, 0);
-  }
-  
-
-  function renderSortIndicator(column: string) {
-    if (sortBy === column) {
-      return sortDirection === "ascending" ? 
-        <TbSortAscending className="sort-icon" /> : 
-        <TbSortDescending className="sort-icon" />;
-    }
-    return null;
-  }
+    fetchOsName();
+  }, []);
 
   return (
-    <main className="container">
-      {!hasFetched ? (
-        <>
-          <form
-            className="row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              getOsName();
-              getProcessesList();
-              setHasFetched(true);
-            }}
-          >
-          </form>
-        </>
-      ) : (
-        <div className="processes">
-          <button
-            className="relaod"
-            onClick={() => {
-              getOsName();
-              getProcessesList();
-              setActiveTab("processes");
-              setSearchQuery("");
+    <HashRouter>
+      <main className="container">
+        {/* Header Section */}
+        <div className="header">
+          <p className="os-name">Operating System: {osName || "Loading..."}</p>
+          <button 
+            className="reload"
+            onClick={async () => {
+              try {
+                const name = await invoke<string>("os_name");
+                setOSName(name);
+              } catch (error) {
+                console.error("Error reloading OS name:", error);
+              }
             }}
           >
             <TbReload />
           </button>
         </div>
-      )}
-      <p className="os-name">Operating System: {osName}</p>
-      {/* Tabs*/}
-      <div className="tabs">
-        <div
-          className={`tab ${activeTab === "processes" ? "active" : ""}`}
-          onClick={() => handleTabClick("processes")}
-        >
-          Processes
-        </div>
-        <div
-          className={`tab ${activeTab === "resources" ? "active" : ""}`}
-          onClick={() => handleTabClick("resources")}
-        >
-          Resources
-        </div>
-        {/* TODO: add more tabs here */}
-      </div>
-      {/* Resources TAB */}
-      {activeTab === "resources" && (
-        <div className="resources">
-          <div className="resource-row">
-            <p>CPU Usage:</p>
-            <div className="resource-box">[CPU Graph]</div>
-          </div>
-          <div className="resource-row">
-            <p>Memory Usage:</p>
-            <div className="resource-box">[Memory Graph]</div>
-          </div>
-          <div className="resource-row">
-            <p>Disk Usage:</p>
-            <div className="resource-box">[Disk Graph]</div>
-          </div>
-        </div>
-      )}
-      {/* Processes TAB */}
-      {activeTab === "processes" && (
-        <>
-          {/* Search bar */}
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search by name or PID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          <div className="processes"> 
-            {/* Sorting Click */}
-            <table>
-              <thead>
-                <tr>
-                  <th onClick={() => handleSort("pid")} className="sortable-header">
-                    PID {renderSortIndicator("pid")}
-                  </th>
-                  <th onClick={() => handleSort("name")} className="sortable-header">
-                    Name {renderSortIndicator("name")}
-                  </th>
-                  <th onClick={() => handleSort("cpu_usage")} className="sortable-header">
-                    CPU % {renderSortIndicator("cpu_usage")}
-                  </th>
-                  <th onClick={() => handleSort("mem_usage")} className="sortable-header">
-                    Mem % {renderSortIndicator("mem_usage")}
-                  </th>
-                  <th onClick={() => handleSort("username")} className="sortable-header">
-                    User {renderSortIndicator("username")}
-                  </th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {processes
-                  .filter(
-                    (process) =>
-                      process.name
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                      process.pid.toString().includes(searchQuery)
-                  )
-                  .map((process) => (
-                    <tr key={process.pid}>
-                      <td>{process.pid}</td>
-                      <td>{process.name}</td>
-                      <td>{process.cpu_usage}</td>
-                      <td>{process.mem_usage}</td>
-                      <td>{process.username}</td>
-                      <td>{process.status}</td>
-                      <td>
-                        <button
-                          className="kill"
-                          onClick={() => handleKill(process.pid)}
-                        >
-                          Kill
-                        </button>
-                        <button
-                          className="suspend"
-                          onClick={() => handleSuspend(process.pid)}
-                        >
-                          Suspend
-                        </button>
-                        <button
-                          className="resume"
-                          onClick={() => handleResume(process.pid)}
-                        >
-                          Resume
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-    </main>
+
+        <Navigation />
+
+        <Routes>
+          <Route path="/processes" element={<ProcessesView />} />
+          <Route path="/resources" element={<ResourcesView />} />
+          <Route path="/" element={<Navigate to="/processes" replace />} />
+          <Route path="*" element={<Navigate to="/processes" replace />} />
+        </Routes>
+      </main>
+    </HashRouter>
   );
 }
-
-export default App;

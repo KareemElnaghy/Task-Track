@@ -120,6 +120,8 @@ button:hover {
   cursor: pointer;
   margin-right: 10px;
   border-radius: 5px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .tab:hover {
@@ -130,6 +132,7 @@ button:hover {
   background-color: #e0bbf0;
   border-bottom: 3px solid #ab6beb;
 }
+
 
 /* resource tab */
 .resources {
