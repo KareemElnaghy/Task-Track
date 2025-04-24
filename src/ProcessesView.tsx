@@ -97,7 +97,7 @@ export default function ProcessesView() {
   };
 
   const handleContextMenuAction = () => {
-    navigate("/process-tree", { 
+    navigate("/process-subtree", { 
       state: { 
         pid: contextMenu.selectedPid 
       } 

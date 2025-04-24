@@ -242,50 +242,52 @@ fn get_process_tree() -> Vec<ProcessTreeNode> {
     roots
 }
 
-// #[tauri::command]
-// fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
-//     let mut sys = System::new_all();
-//     sys.refresh_all();
+#[tauri::command]
+fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
+    let mut sys = System::new_all();
+    sys.refresh_all();
     
-//     let processes = sys.processes();
-//     let mut parent_map: HashMap<Pid, Vec<Pid>> = HashMap::new();
+    let processes = sys.processes();
+    let mut parent_map: HashMap<Pid, Vec<Pid>> = HashMap::new();
 
-//     // Build parent-child relationships
-//     for (pid, process) in processes {
-//         let ppid = process.parent().unwrap_or_else(|| Pid::from(0));
-//         parent_map.entry(ppid).or_default().push(*pid);
-//     }
+    // Build parent-child relationships
+    for (pid, process) in processes {
+        let ppid = process.parent().unwrap_or_else(|| Pid::from_u32(0));
+        parent_map.entry(ppid).or_default().push(*pid);
+    }
 
-//     // Use the same build_tree function as before
-//     fn build_tree(
-//         pid: Pid,
-//         processes: &HashMap<Pid, Process>,
-//         parent_map: &HashMap<Pid, Vec<Pid>>,
-//     ) -> Option<ProcessTreeNode> {
-//         let process = processes.get(&pid)?;
-//         let children = parent_map.get(&pid)
-//             .map(|pids| pids.iter()
-//                 .filter_map(|child_pid| build_tree(*child_pid, processes, parent_map))
-//                 .collect())
-//             .unwrap_or_default();
+    // Recursive function to build the tree
+    fn build_tree(
+        pid: Pid,
+        processes: &HashMap<Pid, Process>,
+        parent_map: &HashMap<Pid, Vec<Pid>>,
+    ) -> Option<ProcessTreeNode> {
+        let process = processes.get(&pid)?;
+        let children = parent_map.get(&pid)
+            .map(|pids| pids.iter()
+                .filter_map(|child_pid| build_tree(*child_pid, processes, parent_map))
+                .collect())
+            .unwrap_or_default();
 
-//         Some(ProcessTreeNode {
-//             pid: pid.as_u32(),
-//             name: process.name().to_string_lossy().into_owned(),
-//             children,
-//         })
-//     }
+        Some(ProcessTreeNode {
+            pid: pid.as_u32(),
+            name: process.name().to_string_lossy().into_owned(),
+            children,
+        })
+    }
 
-//     // Build tree starting from the specified PID
-//     build_tree(Pid::from(pid), &processes, &parent_map)
-// }
+    // Build tree starting from the specified PID
+    build_tree(Pid::from_u32(pid), &processes, &parent_map)
+}
+
+
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree])
+        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree, get_process_subtree])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

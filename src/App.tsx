@@ -5,6 +5,7 @@ import { TbReload } from "react-icons/tb";
 import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
 import ProcessTreeView from "./ProcessesTreeView";
+import ProcessSubtreeView from "./ProcessSubtreeView";
 import "./App.css";
 
 const Navigation = () => {
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/processes" element={<ProcessesView />} />
           <Route path="/resources" element={<ResourcesView />} />
           <Route path="/process-tree" element={<ProcessTreeView />} />
+          <Route path="/process-subtree" element={<ProcessSubtreeView />} />
           <Route path="/" element={<Navigate to="/processes" replace />} />
           <Route path="*" element={<Navigate to="/processes" replace />} />
         </Routes>
