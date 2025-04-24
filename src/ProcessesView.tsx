@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TbReload, TbSortAscending, TbSortDescending } from "react-icons/tb";
 import { invoke } from "@tauri-apps/api/core";
+import { useNavigate } from "react-router-dom";
 import "./App.css";
 
 interface Process {
@@ -12,12 +13,27 @@ interface Process {
   username: string;
 }
 
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  selectedPid: string | null;
+}
+
 export default function ProcessesView() {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("cpu_usage");
   const [sortDirection, setSortDirection] = useState("descending");
   const [osName, setOSName] = useState("");
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    selectedPid: null,
+  });
+  const navigate = useNavigate();
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // Initial fetch and auto-refresh
   useEffect(() => {
@@ -70,8 +86,39 @@ export default function ProcessesView() {
     return null;
   };
 
+  const handleRowContextMenu = (event: React.MouseEvent, process: Process) => {
+    event.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY,
+      selectedPid: process.pid
+    });
+  };
+
+  const handleContextMenuAction = () => {
+    navigate("/process-tree", { 
+      state: { 
+        pid: contextMenu.selectedPid 
+      } 
+    });
+  };
+  
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tableRef.current && !tableRef.current.contains(event.target as Node)) {
+        setContextMenu({ ...contextMenu, visible: false });
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [contextMenu]);
+
   return (
-    <div className="processes-view">
+    <div className="processes-view" ref={tableRef}>
       <div className="search-bar">
         <input
           type="text"
@@ -81,6 +128,26 @@ export default function ProcessesView() {
           className="search-input"
         />
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div 
+          className="context-menu"
+          style={{
+            position: 'absolute',
+            left: contextMenu.x,
+            top: contextMenu.y,
+            zIndex: 1000,
+          }}
+        >
+          <div 
+            className="menu-item"
+            onClick={() => handleContextMenuAction('view-tree')}
+          >
+            View Process Tree
+          </div>
+        </div>
+      )}
 
       <div className="processes-table">
         <table>
@@ -112,7 +179,10 @@ export default function ProcessesView() {
                 process.pid.toString().includes(searchQuery)
               )
               .map(process => (
-                <tr key={process.pid}>
+                <tr 
+                  key={process.pid}
+                  onContextMenu={(e) => handleRowContextMenu(e, process)}
+                >
                   <td>{process.pid}</td>
                   <td>{process.name}</td>
                   <td>{process.cpu_usage}</td>

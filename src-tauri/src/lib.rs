@@ -5,6 +5,8 @@ use std::process::Command;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
+use sysinfo::Process;
+
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
@@ -14,6 +16,13 @@ struct ProcessInfo { // struct to hold process information
     cpu_usage: f32, 
     mem_usage: f32,
     username: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct ProcessTreeNode {
+    pid: u32,
+    name: String,
+    children: Vec<ProcessTreeNode>,
 }
 
 // cache for usernames
@@ -185,11 +194,98 @@ fn resume_process(pid: u32) -> bool {
     }
 }
 
+#[tauri::command]
+fn get_process_tree() -> Vec<ProcessTreeNode> {
+    let mut sys = System::new_all();
+    
+    // Match your existing refresh pattern from get_processes
+    sys.refresh_all();
+    std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+    sys.refresh_all();
+
+    let processes = sys.processes();
+    let mut parent_map: HashMap<Pid, Vec<Pid>> = HashMap::new();
+
+    // Build parent-child relationships
+    for (pid, process) in processes {
+        let ppid = process.parent().unwrap_or_else(|| Pid::from(0));
+        parent_map.entry(ppid).or_default().push(*pid);
+    }
+
+    // Recursive tree builder
+    fn build_tree(
+        pid: Pid,
+        processes: &HashMap<Pid, Process>,  // Changed to Process instead of &Process
+        parent_map: &HashMap<Pid, Vec<Pid>>,
+    ) -> Option<ProcessTreeNode> {
+        let process = processes.get(&pid)?;
+        
+        Some(ProcessTreeNode {
+            pid: pid.as_u32(),
+            name: process.name().to_string_lossy().into_owned(), // Fixed string conversion
+            children: parent_map.get(&pid)
+                .map(|pids| pids.iter()
+                    .filter_map(|child_pid| build_tree(*child_pid, processes, parent_map))
+                    .collect())
+                .unwrap_or_default(),
+        })
+    }
+
+    // Get root processes
+    let mut roots = Vec::new();
+    for root_pid in [Pid::from(0), Pid::from(1)] {  // Proper iteration
+        if let Some(root) = build_tree(root_pid, &processes, &parent_map) {
+            roots.push(root);
+        }
+    }
+    
+    roots
+}
+
+// #[tauri::command]
+// fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
+//     let mut sys = System::new_all();
+//     sys.refresh_all();
+    
+//     let processes = sys.processes();
+//     let mut parent_map: HashMap<Pid, Vec<Pid>> = HashMap::new();
+
+//     // Build parent-child relationships
+//     for (pid, process) in processes {
+//         let ppid = process.parent().unwrap_or_else(|| Pid::from(0));
+//         parent_map.entry(ppid).or_default().push(*pid);
+//     }
+
+//     // Use the same build_tree function as before
+//     fn build_tree(
+//         pid: Pid,
+//         processes: &HashMap<Pid, Process>,
+//         parent_map: &HashMap<Pid, Vec<Pid>>,
+//     ) -> Option<ProcessTreeNode> {
+//         let process = processes.get(&pid)?;
+//         let children = parent_map.get(&pid)
+//             .map(|pids| pids.iter()
+//                 .filter_map(|child_pid| build_tree(*child_pid, processes, parent_map))
+//                 .collect())
+//             .unwrap_or_default();
+
+//         Some(ProcessTreeNode {
+//             pid: pid.as_u32(),
+//             name: process.name().to_string_lossy().into_owned(),
+//             children,
+//         })
+//     }
+
+//     // Build tree starting from the specified PID
+//     build_tree(Pid::from(pid), &processes, &parent_map)
+// }
+
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process])
+        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
