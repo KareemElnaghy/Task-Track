@@ -181,3 +181,92 @@ button:hover {
   transform: translateY(-50%);
 }
 
+/* Styling the right click context menu */
+.context-menu {
+  position: absolute;
+  min-width: 180px;
+  background: #232136;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 1.5px 6px rgba(100, 100, 255, 0.06);
+  border: 1px solid #5d5b8d;
+  padding: 8px 0;
+  z-index: 1000;
+  animation: contextMenuFadeIn 0.15s ease;
+}
+
+@keyframes contextMenuFadeIn {
+  from { opacity: 0; transform: translateY(-10px);}
+  to   { opacity: 1; transform: translateY(0);}
+}
+
+.menu-item {
+  color: #ececff;
+  font-size: 15px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 100%;
+  outline: none;
+}
+
+.context-menu:hover,
+.context-menuitem {
+  background-color: #e0e0e0;
+  color: inherit;
+}
+
+/* Process Tree Styling */
+
+/* App.css */
+.process-tree-view {
+  padding: 20px;
+}
+
+.tree-node {
+  margin: 4px 0;
+  border-left: 1px solid #4a4a4a;
+}
+
+.node-content {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.node-content:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.node-content.selected {
+  background: rgba(171, 107, 235, 0.15);
+}
+
+.pid {
+  color: #ab6beb;
+  font-family: monospace;
+  min-width: 60px;
+}
+
+.name {
+  color: #ececff;
+}
+
+.back-button {
+  background: none;
+  border: 1px solid #5d5b8d;
+  color: #ececff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: rgba(93, 91, 141, 0.3);
+}

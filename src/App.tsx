@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { TbReload } from "react-icons/tb";
 import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
+import ProcessTreeView from "./ProcessTreeView";
 import "./App.css";
 
 const Navigation = () => {
@@ -21,6 +22,12 @@ const Navigation = () => {
         className={`tab ${location.pathname === '/resources' ? 'active' : ''}`}
       >
         Resources
+      </Link>
+      <Link 
+        to="/processTree" 
+        className={`tab ${location.pathname === '/processTree' ? 'active' : ''}`}
+      >
+        Process Tree
       </Link>
     </div>
   );
@@ -70,6 +77,7 @@ export default function App() {
         <Routes>
           <Route path="/processes" element={<ProcessesView />} />
           <Route path="/resources" element={<ResourcesView />} />
+          <Route path="/processTree" element={<ProcessTreeView />} />
           <Route path="/" element={<Navigate to="/processes" replace />} />
           <Route path="*" element={<Navigate to="/processes" replace />} />
         </Routes>
