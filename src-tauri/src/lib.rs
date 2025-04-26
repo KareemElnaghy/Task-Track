@@ -1,6 +1,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use serde::{Serialize, Deserialize};
-use sysinfo::{System, Pid};
+use sysinfo::{System,Pid,Cpu};
 use std::process::Command;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -287,7 +287,32 @@ fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree, get_process_subtree])
+        .invoke_handler(tauri::generate_handler![os_name, get_processes, 
+            kill_process,suspend_process,resume_process, get_process_tree, 
+            get_process_subtree, get_cpu_count, get_cpu_usage, get_cpu_frequency, 
+            get_cpu_load])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+//get the number of cpus
+#[tauri::command]
+fn get_cpu_count() -> usize {
+    let sys = System::new_all();
+    sys.cpus().len()
+}
+#[tauri::command]
+fn get_cpu_usage() -> Vec<f32> {
+    let sys = System::new_all();
+    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect()
+}
+#[tauri::command]
+fn get_cpu_frequency() -> Vec<u64> {
+    let sys = System::new_all();
+    sys.cpus().iter().map(|cpu| cpu.frequency()).collect()
+}
+//cpu load
+#[tauri::command]
+fn get_cpu_load() -> Vec<f32> {
+    let sys = System::new_all();
+    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect() // Using cpu_usage instead
 }
