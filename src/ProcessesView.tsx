@@ -34,6 +34,7 @@ export default function ProcessesView() {
   });
   const navigate = useNavigate();
   const tableRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Initial fetch and auto-refresh
   useEffect(() => {
@@ -85,6 +86,26 @@ export default function ProcessesView() {
     return null;
   };
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).closest("tr")?.onContextMenu // Don't close when clicking the row that opened it
+      ) {
+        setContextMenu((prev) => ({ ...prev, visible: false }));
+      }
+    };
+
+    if (contextMenu.visible) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [contextMenu.visible]);
+
   const handleRowContextMenu = (event: React.MouseEvent, process: Process) => {
     event.preventDefault();
     setContextMenu({
@@ -118,34 +139,36 @@ export default function ProcessesView() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [contextMenu]);
 
-  const handleGroupAction = async (action: 'kill' | 'suspend' | 'resume') => {
+  const handleGroupAction = async (action: "kill" | "suspend" | "resume") => {
     if (selectedProcesses.length === 0) return;
-    
-      const pids = selectedProcesses.map(pid => parseInt(pid));
-      let results;
-      
-      switch (action) {
-        case 'kill':
-          results = await invoke<Array<[number, boolean]>>("kill_processes", { pids });
-          break;
-        case 'suspend':
-          results = await invoke<Array<[number, boolean]>>("suspend_processes", { pids });
-          break;
-        case 'resume':
-          results = await invoke<Array<[number, boolean]>>("resume_processes", { pids });
-          break;
-      }
-      
-      // Refresh process list
-      getProcessesList();
-      
-      // Reset selections after operation completes
-      setSelectedProcesses([]);
-      
-    
+
+    const pids = selectedProcesses.map((pid) => parseInt(pid));
+    let results;
+
+    switch (action) {
+      case "kill":
+        results = await invoke<Array<[number, boolean]>>("kill_processes", {
+          pids,
+        });
+        break;
+      case "suspend":
+        results = await invoke<Array<[number, boolean]>>("suspend_processes", {
+          pids,
+        });
+        break;
+      case "resume":
+        results = await invoke<Array<[number, boolean]>>("resume_processes", {
+          pids,
+        });
+        break;
+    }
+
+    // Refresh process list
+    getProcessesList();
+
+    // Reset selections after operation completes
+    setSelectedProcesses([]);
   };
-  
-  
 
   return (
     <div className="processes-view" ref={tableRef}>
@@ -159,9 +182,10 @@ export default function ProcessesView() {
         />
       </div>
 
-      {/* Context Menu */}
+      {/* Right Click Context Menu */}
       {contextMenu.visible && (
         <div
+          ref={contextMenuRef}
           className="context-menu"
           style={{
             position: "absolute",
@@ -177,15 +201,17 @@ export default function ProcessesView() {
       )}
 
       <div className="processes-table">
-         <div className="group-actions"> {/*TODO: Group Action Buttons where to put? */}
-         {selectedProcesses.length > 0 && (
-    <button 
-      className="deselect-all-button"
-      onClick={() => setSelectedProcesses([])}
-    >
-      Deselect All
-    </button>
-  )}
+        <div className="group-actions">
+          {" "}
+          {/*TODO: Group Action Buttons where to put? */}
+          {selectedProcesses.length > 0 && (
+            <button
+              className="deselect-all-button"
+              onClick={() => setSelectedProcesses([])}
+            >
+              Deselect All
+            </button>
+          )}
           <button
             disabled={selectedProcesses.length === 0}
             onClick={() => handleGroupAction("kill")}
@@ -236,9 +262,9 @@ export default function ProcessesView() {
               >
                 User {renderSortIndicator("username")}
               </th>
-              <th>Status</th>
-              <th>Actions</th>
-              <th>Select</th>
+              <th className="process-header">Status</th>
+              <th className="process-header">Actions</th>
+              <th className="process-header">Select</th>
             </tr>
           </thead>
           <tbody>
