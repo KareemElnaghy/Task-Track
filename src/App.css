@@ -270,3 +270,9 @@ button:hover {
 .back-button:hover {
   background: rgba(93, 91, 141, 0.3);
 }
+
+/* Process Table for selecting */
+table tbody tr.selected-row {
+  background-color: #ab6beb33 !important;
+}
+

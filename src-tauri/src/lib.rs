@@ -254,7 +254,7 @@ fn resume_processes(pids: Vec<u32>) -> Vec<(u32, bool)> {
     results
 }
 
-
+// Process Tree Functions
 #[tauri::command]
 fn get_process_tree() -> Vec<ProcessTreeNode> {
     let mut sys = System::new_all();
@@ -345,7 +345,8 @@ fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree, get_process_subtree])
+        .invoke_handler(tauri::generate_handler![os_name, get_processes, kill_process,suspend_process,resume_process, get_process_tree, get_process_subtree
+        ,kill_processes, suspend_processes, resume_processes])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
