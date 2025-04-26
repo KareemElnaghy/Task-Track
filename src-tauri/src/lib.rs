@@ -152,6 +152,7 @@ fn get_processes(sort_by: String, direction: Option<String>) -> Vec<ProcessInfo>
 }
 
 
+// Single Process Operations (Kill, Resume, Suspend)
 
 #[tauri::command]
 fn kill_process(pid: u32) -> bool {
@@ -193,6 +194,66 @@ fn resume_process(pid: u32) -> bool {
         Err(_) => false
     }
 }
+
+// Group Process Operations (Kill, Suspend, Resume)
+
+#[tauri::command]
+fn kill_processes(pids: Vec<u32>) -> Vec<(u32, bool)> {
+    let mut results = Vec::new();
+    let mut sys = System::new_all();
+    sys.refresh_all();
+    
+    for pid in pids {
+        let system_pid = Pid::from_u32(pid);
+        let success = if let Some(process) = sys.process(system_pid) {
+            process.kill();
+            true
+        } else {
+            false
+        };
+        results.push((pid, success));
+    }
+    results
+}
+
+#[tauri::command]
+fn suspend_processes(pids: Vec<u32>) -> Vec<(u32, bool)> {
+    let mut results = Vec::new();
+    
+    for pid in pids {
+        let output = Command::new("kill")
+            .arg("-STOP")
+            .arg(pid.to_string())
+            .output();
+        
+        let success = match output {
+            Ok(output) => output.status.success(),
+            Err(_) => false
+        };
+        results.push((pid, success));
+    }
+    results
+}
+
+#[tauri::command]
+fn resume_processes(pids: Vec<u32>) -> Vec<(u32, bool)> {
+    let mut results = Vec::new();
+    
+    for pid in pids {
+        let output = Command::new("kill")
+            .arg("-CONT")
+            .arg(pid.to_string())
+            .output();
+        
+        let success = match output {
+            Ok(output) => output.status.success(),
+            Err(_) => false
+        };
+        results.push((pid, success));
+    }
+    results
+}
+
 
 #[tauri::command]
 fn get_process_tree() -> Vec<ProcessTreeNode> {
@@ -275,11 +336,8 @@ fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
             children,
         })
     }
-
-    // Build tree starting from the specified PID
     build_tree(Pid::from_u32(pid), &processes, &parent_map)
 }
-
 
 
 
