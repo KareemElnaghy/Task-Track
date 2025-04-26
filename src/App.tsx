@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { TbReload } from "react-icons/tb";
 import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
-import ProcessTreeView from "./ProcessesTreeView";
+import ProcessTreeView from "./ProcessTreeView";
 import ProcessSubtreeView from "./ProcessSubtreeView";
 import "./App.css";
 

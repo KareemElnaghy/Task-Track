@@ -38,7 +38,6 @@ export default function ProcessesView() {
   // Initial fetch and auto-refresh
   useEffect(() => {
     const fetchData = async () => {
-      await getOsName();
       await getProcessesList();
     };
     
@@ -46,15 +45,6 @@ export default function ProcessesView() {
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
   }, [sortBy, sortDirection]);
-
-  async function getOsName() {
-    try {
-      const name = await invoke<string>("os_name");
-      setOSName(name);
-    } catch (error) {
-      console.error("Error getting OS name:", error);
-    }
-  }
 
   async function getProcessesList() {
     try {
@@ -142,7 +132,7 @@ export default function ProcessesView() {
         >
           <div 
             className="menu-item"
-            onClick={() => handleContextMenuAction('view-tree')}
+            onClick={() => handleContextMenuAction()}
           >
             View Process Tree
           </div>
