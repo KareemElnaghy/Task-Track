@@ -217,11 +217,11 @@ button:hover {
   outline: none;
 }
 
-.context-menu:hover,
+/* .context-menu:hover,
 .context-menuitem {
   background-color: #e0e0e0;
   color: inherit;
-}
+} */
 
 /* Process Tree Styling */
 
@@ -278,5 +278,35 @@ button:hover {
 /* Process Table for selecting */
 table tbody tr.selected-row {
   background-color: #ab6beb33 !important;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: #5d5b8d;
+  margin: 6px 0;
+}
+
+
+.menu-item {
+  color: #ececff;
+  font-size: 15px;
+  padding: 10px 24px;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 95%;
+  outline: none;
+  box-sizing: border-box;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+  background: linear-gradient(90deg, #fff 0%, #f0f0f0 100%);
+  color: #232136;
+  border-radius: 6px;
+  margin: 0 8px;
 }
 

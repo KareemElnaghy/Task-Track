@@ -197,41 +197,40 @@ export default function ProcessesView() {
           <div className="menu-item" onClick={() => handleContextMenuAction()}>
             View Process Tree
           </div>
+
+          {selectedProcesses.length > 0 && (
+            <>
+              <div className="menu-separator"></div>
+              <div
+                className="menu-item"
+                onClick={() => handleGroupAction("kill")}
+              >
+                Kill Selected ({selectedProcesses.length})
+              </div>
+              <div
+                className="menu-item"
+                onClick={() => handleGroupAction("suspend")}
+              >
+                Suspend Selected ({selectedProcesses.length})
+              </div>
+              <div
+                className="menu-item"
+                onClick={() => handleGroupAction("resume")}
+              >
+                Resume Selected ({selectedProcesses.length})
+              </div>
+              <div
+                className="menu-item"
+                onClick={() => setSelectedProcesses([])}
+              >
+                Deselect All
+              </div>
+            </>
+          )}
         </div>
       )}
 
       <div className="processes-table">
-        <div className="group-actions">
-          {" "}
-          {/*TODO: Group Action Buttons where to put? */}
-          {selectedProcesses.length > 0 && (
-            <button
-              className="deselect-all-button"
-              onClick={() => setSelectedProcesses([])}
-            >
-              Deselect All
-            </button>
-          )}
-          <button
-            disabled={selectedProcesses.length === 0}
-            onClick={() => handleGroupAction("kill")}
-          >
-            Kill Selected
-          </button>
-          <button
-            disabled={selectedProcesses.length === 0}
-            onClick={() => handleGroupAction("suspend")}
-          >
-            Suspend Selected
-          </button>
-          <button
-            disabled={selectedProcesses.length === 0}
-            onClick={() => handleGroupAction("resume")}
-          >
-            Resume Selected
-          </button>
-        </div>
-
         <table>
           <thead>
             <tr>
