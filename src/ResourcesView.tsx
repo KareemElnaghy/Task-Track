@@ -1,35 +1,33 @@
 // ResourcesView.tsx
 import "./App.css";
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { Line } from "react-chartjs-2";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
   Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import "./App.css";
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 function ResourcesView() {
-  // const [cpuData, setCpuData] = useState<CPUData[]>([]);
-  // const [coredata, setCoreData] = useState<number[]>([]);
-  const [memoryData, setMemoryData] = useState<number>(0);
-  // const [cpuGraphData, setCpuGraphData] = useState<any[]>([]);
   const [memoryGraphData, setMemoryGraphData] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
   const [dataPoints, setDataPoints] = useState<number[]>([]);
-  const [memlabels, setmemLabels] = useState<string[]>([]);
-  const [memPoints, setmemPoints] = useState<number[]>([]);
-
-  const cpuColors = [
-    "rgb(255, 0, 0)",
-    "rgb(255, 145, 0)",
-    "rgb(250, 246, 0)",
-    "rgb(13, 100, 35)",
-    "rgb(0, 89, 255)",
-    "rgb(129, 0, 250)",
-  ];
 
   // CPU UTILIZATION
   useEffect(() => {
@@ -69,6 +67,7 @@ function ResourcesView() {
       },
     },
   };
+
   //MEMORY
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -110,6 +109,7 @@ function ResourcesView() {
       },
     },
   };
+
   return (
     <main className="container">
       <div className="resources">
@@ -121,6 +121,7 @@ function ResourcesView() {
         </div>
         <div className="resource-row">
           <p>Memory Usage:</p>
+
           <div className="resource-box">
             <Line data={memChartData} options={memchartOptions} />
           </div>
