@@ -51,6 +51,7 @@ td {
 
 th {
   background-color: #563b5a;
+  background-color: #76557b;
 }
 /* Sticky header */
 thead th {
@@ -82,10 +83,16 @@ tbody tr:nth-child(odd) {
 
 /* Buttons */
 button {
-  padding: 6px 12px;
-  margin-right: 5px;
+  padding: 6px 6px;
+  margin-right: 7px;
+  margin-bottom: 4px;
+  margin-top: 4px;
   border: 2px solid;
   border-radius: 5px;
+  background-color: #e9d8f0;
+  color: #1c0236;
+  font-weight: bold;
+  border: 2px solid #e2c0f0;
   cursor: pointer;
 }
 button.kill {
@@ -297,7 +304,6 @@ table tbody tr.selected-row {
   margin: 6px 0;
 }
 
-
 .menu-item {
   color: #ececff;
   font-size: 15px;
@@ -320,4 +326,3 @@ table tbody tr.selected-row {
   border-radius: 6px;
   margin: 0 8px;
 }
-

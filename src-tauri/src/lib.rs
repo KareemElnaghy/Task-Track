@@ -347,23 +347,12 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
-            get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb, 
-            kill_processes, suspend_processes, resume_processes,get_cpu_utilization])
+            get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
+            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-//get cpu load for all cores
-// This function returns a vector of CPU load percentages for each core
-#[tauri::command]
-fn get_cpu_load_for_all_cores() -> Vec<f32> {
-    let mut sys = System::new_all();
-    sys.refresh_all();
-
-    // Get CPU load for all cores
-    let cpu_loads = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect(); 
-    cpu_loads// Collect CPU usage for each core
-}
 
 // get memory usage in gb
 #[tauri::command]
@@ -373,19 +362,37 @@ fn get_memory_usage_gb() -> f32 {
     sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
 
+static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
+    let mut sys = System::new_all();
+    sys.refresh_cpu_all(); // Initial refresh
+    Mutex::new(sys)
+});
 // get cpu utilization
 #[tauri::command]
 fn get_cpu_utilization() -> f32 {
+    let mut sys = SYS.lock().unwrap();
 
-    let mut sys = System::new_all();
     sys.refresh_cpu_all(); // First refresh
-    thread::sleep(time::Duration::from_millis(500)); // Small delay (500ms)
-    sys.refresh_cpu_all(); // Second refresh to get diff
+    thread::sleep(time::Duration::from_millis(200)); // Lighter delay
+    sys.refresh_cpu_all(); // Second refresh for delta
 
-    let avg_utilization = sys.cpus()
+    let cpus = sys.cpus();
+    let total: f32 = cpus.iter().map(|cpu| cpu.cpu_usage()).sum();
+    total / cpus.len() as f32
+}
+
+// get cpu utilization for each core
+#[tauri::command]
+fn get_cpu_utilization_per_core() -> Vec<f32> {
+    let mut sys = SYS.lock().unwrap();
+
+    sys.refresh_cpu_all(); // First sample
+    thread::sleep(time::Duration::from_millis(200)); // Lighter delay
+    sys.refresh_cpu_all(); // Second sample for actual diff
+
+    sys.cpus()
         .iter()
         .map(|cpu| cpu.cpu_usage())
-        .sum::<f32>() / sys.cpus().len() as f32;
-
-    avg_utilization
+        .collect()
 }
+
