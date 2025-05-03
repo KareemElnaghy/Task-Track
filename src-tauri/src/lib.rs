@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use sysinfo::Process;
+use sysinfo::{Disks,DiskUsage};
 use std::{thread, time};
 
 #[derive(Serialize, Deserialize)]
@@ -395,4 +396,36 @@ fn get_cpu_utilization_per_core() -> Vec<f32> {
         .map(|cpu| cpu.cpu_usage())
         .collect()
 }
+
+// #[tauri::command]
+// fn get_disk_usage() -> Vec<u64> {
+//     let disks = Disks::new_with_refreshed_list();
+//     disks.list().iter().map(|disk| {
+//         let total = disk.total_space();
+//         let available = disk.available_space();
+//         total - available
+//     }).collect()
+// }
+// #[derive(serde::Serialize)]
+// struct DiskUsage {
+//     name: String,
+//     used_space: u64,
+//     total_space: u64,
+// }
+// #[tauri::command]
+// fn get_disk_usage() -> Vec<DiskUsage> {
+//     let disks = Disks::new_with_refreshed_list();
+//     disks.list().iter().map(|disk| {
+//         let total = disk.total_space();
+//         let available = disk.available_space();
+//         let used = total - available;
+//         let name: disk.name();
+
+//         DiskUsage {
+//             name: name,
+//             used_space: used,
+//             total_space: total,
+//         }
+//     }).collect()
+// }
 
