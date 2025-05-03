@@ -347,41 +347,40 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
-            get_process_subtree, get_cpu_count, get_cpu_usage, get_cpu_frequency, 
-            get_cpu_load, kill_processes, suspend_processes, resume_processes])
+            get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb,
+            total_memory, kill_processes, suspend_processes, resume_processes])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-//get the number of cpus
-static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
+
+
+
+
+//get cpu load for all cores
+// This function returns a vector of CPU load percentages for each core
+#[tauri::command]
+fn get_cpu_load_for_all_cores() -> Vec<f32> {
     let mut sys = System::new_all();
-    sys.refresh_all(); // Initial refresh to establish baseline
-    Mutex::new(sys)
-});
-
-#[tauri::command]
-fn get_cpu_count() -> usize {
-    let sys = SYS.lock().unwrap();
-    sys.cpus().len()
-}
-
-#[tauri::command]
-fn get_cpu_usage() -> Vec<f32> {
-    let mut sys = SYS.lock().unwrap();
     sys.refresh_all();
-    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect()
+
+    // Get CPU load for all cores
+    let cpu_loads = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect(); 
+    cpu_loads// Collect CPU usage for each core
 }
 
+// get memory usage in gb
 #[tauri::command]
-fn get_cpu_frequency() -> Vec<u64> {
-    let sys = SYS.lock().unwrap();
-    sys.cpus().iter().map(|cpu| cpu.frequency()).collect()
+fn get_memory_usage_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
-
+// get max memory in gb
 #[tauri::command]
-fn get_cpu_load() -> Vec<f32> {
-    let mut sys = SYS.lock().unwrap();
-    sys.refresh_all();
-    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect() // Using cpu_usage as load
+fn total_memory() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.total_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
 
+      

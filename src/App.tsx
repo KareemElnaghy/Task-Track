@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { HashRouter, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
+import {
+  HashRouter,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { TbReload } from "react-icons/tb";
 import ProcessesView from "./ProcessesView";
@@ -12,21 +19,23 @@ const Navigation = () => {
   const location = useLocation();
   return (
     <div className="tabs">
-      <Link 
-        to="/processes" 
-        className={`tab ${location.pathname === '/processes' ? 'active' : ''}`}
+      <Link
+        to="/processes"
+        className={`tab ${location.pathname === "/processes" ? "active" : ""}`}
       >
         Processes
       </Link>
-      <Link 
-        to="/resources" 
-        className={`tab ${location.pathname === '/resources' ? 'active' : ''}`}
+      <Link
+        to="/resources"
+        className={`tab ${location.pathname === "/resources" ? "active" : ""}`}
       >
         Resources
       </Link>
-      <Link 
-        to="/process-tree" 
-        className={`tab ${location.pathname === '/process-tree' ? 'active' : ''}`}
+      <Link
+        to="/process-tree"
+        className={`tab ${
+          location.pathname === "/process-tree" ? "active" : ""
+        }`}
       >
         Process Tree
       </Link>
@@ -48,7 +57,7 @@ export default function App() {
         setOSName("Unknown OS");
       }
     };
-    
+
     fetchOsName();
   }, []);
 
@@ -58,7 +67,7 @@ export default function App() {
         {/* Header Section */}
         <div className="header">
           <p className="os-name">Operating System: {osName || "Loading..."}</p>
-          <button 
+          <button
             className="reload"
             onClick={async () => {
               try {
