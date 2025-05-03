@@ -347,8 +347,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
-            get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb,
-            total_memory, kill_processes, suspend_processes, resume_processes,get_cpu_utilization])
+            get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb, 
+            kill_processes, suspend_processes, resume_processes,get_cpu_utilization])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -373,14 +373,7 @@ fn get_memory_usage_gb() -> f32 {
     sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
 
-// get memory usage in gb
-#[tauri::command]
-fn get_memory_usage_gb() -> f32 {
-    let mut sys = System::new_all();
-    sys.refresh_memory();
-    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
-}
-// get max memory in gb
+// get cpu utilization
 #[tauri::command]
 fn get_cpu_utilization() -> f32 {
 
