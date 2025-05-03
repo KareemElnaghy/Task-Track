@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use sysinfo::Process;
-
+use std::{thread, time};
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
@@ -348,13 +348,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
             get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb,
-            total_memory, kill_processes, suspend_processes, resume_processes])
+            total_memory, kill_processes, suspend_processes, resume_processes,get_cpu_utilization])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
-
 
 //get cpu load for all cores
 // This function returns a vector of CPU load percentages for each core
@@ -375,12 +372,27 @@ fn get_memory_usage_gb() -> f32 {
     sys.refresh_memory();
     sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
-// get max memory in gb
+
+// get memory usage in gb
 #[tauri::command]
-fn total_memory() -> f32 {
+fn get_memory_usage_gb() -> f32 {
     let mut sys = System::new_all();
     sys.refresh_memory();
-    sys.total_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
+// get max memory in gb
+#[tauri::command]
+fn get_cpu_utilization() -> f32 {
 
-      
+    let mut sys = System::new_all();
+    sys.refresh_cpu_all(); // First refresh
+    thread::sleep(time::Duration::from_millis(500)); // Small delay (500ms)
+    sys.refresh_cpu_all(); // Second refresh to get diff
+
+    let avg_utilization = sys.cpus()
+        .iter()
+        .map(|cpu| cpu.cpu_usage())
+        .sum::<f32>() / sys.cpus().len() as f32;
+
+    avg_utilization
+}

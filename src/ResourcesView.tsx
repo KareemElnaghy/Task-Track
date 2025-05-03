@@ -23,137 +23,70 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-interface CPUData {
-  core: number;
-  load: number;
-}
 
 function ResourcesView() {
-  // const [cpuData, setCpuData] = useState<number[][]>([]);
-  // const [labels, setLabels] = useState<string[]>([]);
-  // const [memData, setMemData] = useState<number[]>([]);
-
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     const usage = await invoke<number[]>("get_cpu_load_for_all_cores");
-  //     setCpuData((prev) => [...prev.slice(-29), usage]);
-  //     setLabels((prev) => [
-  //       ...prev.slice(-29),
-  //       new Date().toLocaleTimeString(),
-  //     ]);
-  //     const memUsage = await invoke<number>("get_memory_usage");
-  //     setMemData((prev) => [...prev.slice(-29), memUsage]);
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  // const data = {
-  //   //CPU load for all cores
-  //   labels,
-  //   datasets:
-  //     cpuData[0]?.map((_, index) => ({
-  //       label: `Core ${index + 1}`,
-  //       data: cpuData.map((usage) => usage[index]),
-  //       borderColor: `hsl(${(index * 360) / cpuData[0]?.length}, 100%, 50%)`,
-  //       fill: false,
-  //       tension: 0.3,
-  //     })) || [],
-
-  const [cpuData, setCpuData] = useState<CPUData[]>([]);
-  const [memoryData, setMemoryData] = useState<number>(0);
-  const [cpuGraphData, setCpuGraphData] = useState<any[]>([]);
   const [memoryGraphData, setMemoryGraphData] = useState<number[]>([]);
-  const cpuColors = [
-    "rgb(255, 0, 0)",
-    "rgb(255, 145, 0)",
-    "rgb(250, 246, 0)",
-    "rgb(13, 100, 35)",
-    "rgb(0, 89, 255)",
-    "rgb(129, 0, 250)",
-  ];
+  const [labels, setLabels] = useState<string[]>([]);
+  const [dataPoints, setDataPoints] = useState<number[]>([]);
 
+  // CPU UTILIZATION
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Get CPU load data for all cores
-        const cpuLoad = (await invoke(
-          "get_cpu_load_for_all_cores"
-        )) as number[];
-        console.log("Fetched CPU Load:", cpuLoad); // Log the fetched CPU data
-        const memoryUsage = (await invoke("get_memory_usage_gb")) as number;
+    const interval = setInterval(async () => {
+      const cpuUtilization: number = await invoke("get_cpu_utilization");
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString();
+      setDataPoints((prev) => [...prev, cpuUtilization]);
+      setLabels((prev) => [...prev, timestamp]);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const CPUchartData = {
+    labels,
+    datasets: [
+      {
+        label: "CPU Utilization Over Time",
+        data: dataPoints,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+  const CPUchartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        suggestedMin: Math.min(...dataPoints) - 1,
+        suggestedMax: Math.max(...dataPoints) + 1,
+        title: { display: true, text: "CPU Utilization (%)" },
+      },
+      x: {
+        title: { display: true, text: "Time (s)" },
+      },
+    },
+  };
 
-        // Update CPU Data (one line per core)
-        setCpuData(cpuLoad.map((load, index) => ({ core: index + 1, load })));
-
-        // Update Memory Data
-        setMemoryData(memoryUsage);
-      } catch (error) {
-        console.error("Error fetching system stats:", error);
-      }
-    };
-
-    fetchData();
-    // Update every 1 second
-    const interval = setInterval(fetchData, 1000);
-
+  //MEMORY
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const memoryUsage = (await invoke("get_memory_usage_gb")) as number;
+      setMemoryGraphData((prevData) => [...prevData, memoryUsage]);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (cpuData.length > 0) {
-      setCpuGraphData((prevData) => {
-        const newData = [...prevData];
-
-        cpuData.forEach(({ core, load }, index) => {
-          const label = `Core ${core}`;
-          const existing = newData.find((d) => d.label === label);
-
-          if (existing) {
-            existing.data = [...existing.data.slice(-29), load];
-          } else {
-            newData.push({
-              label,
-              data: [load],
-              borderColor: cpuColors[index % cpuColors.length],
-              backgroundColor: `${cpuColors[index % cpuColors.length]
-                .replace("rgb", "rgba")
-                .replace(")", ", 0.3)")}`,
-              fill: true,
-              tension: 0.4,
-            });
-          }
-        });
-
-        return newData;
-      });
-    }
-
-    if (memoryData !== undefined) {
-      setMemoryGraphData((prevData) => [...prevData, memoryData]); // Update memory graph data
-    }
-  }, [cpuData, memoryData]);
-
-  const cpuChartData = {
-    labels: Array.from(
-      { length: cpuGraphData.length > 0 ? cpuGraphData[0]?.data.length : 0 },
-      (_, i) =>
-        new Date(
-          Date.now() - (memoryGraphData.length - i) * 1000
-        ).toLocaleTimeString()
-    ),
-    datasets: cpuGraphData,
-  };
-
-  const memoryChartData = {
-    labels: Array.from({ length: memoryGraphData.length }, (_, i) =>
-      new Date(
+  const memChartData = {
+    labels: Array.from({ length: memoryGraphData.length }, (_, i) => {
+      const timestamp = new Date(
         Date.now() - (memoryGraphData.length - i) * 1000
-      ).toLocaleTimeString()
-    ),
+      );
+      return timestamp.toLocaleTimeString();
+    }),
     datasets: [
       {
-        label: "Memory Usage",
+        label: "Memory Usage GB",
         data: memoryGraphData,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.2)",
@@ -162,61 +95,35 @@ function ResourcesView() {
       },
     ],
   };
+  const memchartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        suggestedMin: Math.min(...memoryGraphData) - 1,
+        suggestedMax: Math.max(...memoryGraphData) + 1,
+        title: { display: true, text: "GB" },
+      },
+      x: {
+        title: { display: true, text: "Time (s)" },
+      },
+    },
+  };
 
   return (
     <main className="container">
       <div className="resources">
         <div className="resource-row">
-          <p>CPU Usage:</p>
-          {/* <div className="resource-box">
-            <div className="p-4">
-              <h1 className="text-xl font-bold mb-4">
-                Live CPU Usage (All Cores)
-              </h1>
-              <Line data={data} />
-            </div>
-          </div>
-        </div> */}
+          <p>CPU Utilization: </p>
           <div className="resource-box">
-            <Line
-              data={cpuChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    ticks: {
-                      stepSize: 1,
-                      callback: (value) => `${value}%`,
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 30,
-                  },
-                },
-              }}
-            />
+            <Line data={CPUchartData} options={CPUchartOptions} />
           </div>
         </div>
         <div className="resource-row">
           <p>Memory Usage:</p>
 
           <div className="resource-box">
-            <Line
-              data={memoryChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    ticks: {
-                      stepSize: 0.5,
-                    },
-                  },
-                },
-              }}
-            />
+            <Line data={memChartData} options={memchartOptions} />
           </div>
         </div>
         <div className="resource-row">
