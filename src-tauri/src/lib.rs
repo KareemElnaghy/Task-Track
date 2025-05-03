@@ -352,37 +352,32 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-//get the number of cpus
-static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
+
+//get cpu load for all cores
+// This function returns a vector of CPU load percentages for each core
+#[tauri::command]
+fn get_cpu_load_for_all_cores() -> Vec<f32> {
     let mut sys = System::new_all();
-    sys.refresh_all(); // Initial refresh to establish baseline
-    Mutex::new(sys)
-});
-
-#[tauri::command]
-fn get_cpu_count() -> usize {
-    let sys = SYS.lock().unwrap();
-    sys.cpus().len()
-}
-
-#[tauri::command]
-fn get_cpu_usage() -> Vec<f32> {
-    let mut sys = SYS.lock().unwrap();
     sys.refresh_all();
-    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect()
+
+    // Get CPU load for all cores
+    let cpu_loads = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect(); 
+    cpu_loads// Collect CPU usage for each core
 }
 
+// get memory usage in gb
 #[tauri::command]
-fn get_cpu_frequency() -> Vec<u64> {
-    let sys = SYS.lock().unwrap();
-    sys.cpus().iter().map(|cpu| cpu.frequency()).collect()
+fn get_memory_usage_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
-
+// get max memory in gb
 #[tauri::command]
-fn get_cpu_load() -> Vec<f32> {
-    let mut sys = SYS.lock().unwrap();
-    sys.refresh_all();
-    sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect() // Using cpu_usage as load
+fn total_memory() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.total_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
 
 #[tauri::command]
@@ -400,4 +395,3 @@ fn get_cpu_utilization() -> f32 {
 
     avg_utilization
 }
-     
