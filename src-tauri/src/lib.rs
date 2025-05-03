@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use sysinfo::Process;
-
+use std::{thread, time};
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
@@ -347,8 +347,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
-            get_process_subtree, get_cpu_count, get_cpu_usage, get_cpu_frequency, 
-            get_cpu_load, kill_processes, suspend_processes, resume_processes])
+            get_process_subtree, get_cpu_load_for_all_cores, get_memory_usage_gb,
+            total_memory, kill_processes, suspend_processes, resume_processes,get_cpu_utilization])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -385,3 +385,19 @@ fn get_cpu_load() -> Vec<f32> {
     sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect() // Using cpu_usage as load
 }
 
+#[tauri::command]
+fn get_cpu_utilization() -> f32 {
+
+    let mut sys = System::new_all();
+    sys.refresh_cpu_all(); // First refresh
+    thread::sleep(time::Duration::from_millis(500)); // Small delay (500ms)
+    sys.refresh_cpu_all(); // Second refresh to get diff
+
+    let avg_utilization = sys.cpus()
+        .iter()
+        .map(|cpu| cpu.cpu_usage())
+        .sum::<f32>() / sys.cpus().len() as f32;
+
+    avg_utilization
+}
+     
