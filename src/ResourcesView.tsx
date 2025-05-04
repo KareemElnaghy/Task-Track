@@ -3,6 +3,7 @@ import "./App.css";
 import { useState, useEffect, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Line } from "react-chartjs-2";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -150,6 +151,19 @@ function ResourcesView() {
     },
   };
 
+  // DISK
+  type DiskThingy = {
+    name: string;
+    used_space: number;
+    total_space: number;
+  };
+
+  const [disks, setDisks] = useState<DiskThingy[]>([]);
+
+  useEffect(() => {
+    invoke<DiskThingy[]>("get_disk_usage").then(setDisks);
+  }, []);
+
   return (
     <main className="container">
       <div className="resources">
@@ -186,7 +200,21 @@ function ResourcesView() {
         </div>
         <div className="resource-row">
           <p>Disk Usage:</p>
-          <div className="resource-box">[Disk Graph]</div>
+          <div></div>
+          <div className="resource-box">
+            {disks.length === 0 ? (
+              <p>Loading disk info...</p>
+            ) : (
+              <ul>
+                {disks.map((disk, idx) => (
+                  <li key={idx}>
+                    <strong>{disk.name}</strong>: Used {disk.used_space} / Total{" "}
+                    {disk.total_space} bytes
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </main>

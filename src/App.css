@@ -173,6 +173,18 @@ button:hover {
   color: #888;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+.resource-pie {
+  flex-grow: 1;
+  max-width: 600px;
+  height: 600px; /* Increased from 180px or 220px */
+  background-color: #f0f0f0;
+  border-radius: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 
 .sortable-header {
   cursor: pointer;

@@ -349,7 +349,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
             get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
-            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core])
+            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -406,26 +406,28 @@ fn get_cpu_utilization_per_core() -> Vec<f32> {
 //         total - available
 //     }).collect()
 // }
-// #[derive(serde::Serialize)]
-// struct DiskUsage {
-//     name: String,
-//     used_space: u64,
-//     total_space: u64,
-// }
-// #[tauri::command]
-// fn get_disk_usage() -> Vec<DiskUsage> {
-//     let disks = Disks::new_with_refreshed_list();
-//     disks.list().iter().map(|disk| {
-//         let total = disk.total_space();
-//         let available = disk.available_space();
-//         let used = total - available;
-//         let name: disk.name();
+#[derive(serde::Serialize)]
+struct diskthingies {
+    name: String,
+    used_space: u64,
+    total_space: u64,
+}
+#[tauri::command]
+fn get_disk_usage() -> Vec<diskthingies> {
+    let disks = Disks::new_with_refreshed_list();
+    disks.list().iter().map(|disk| {
+     
+        let total = disk.total_space();
+        let available = disk.available_space();
+        let used = total - available;
+       
+        
 
-//         DiskUsage {
-//             name: name,
-//             used_space: used,
-//             total_space: total,
-//         }
-//     }).collect()
-// }
+        diskthingies {
+             name: disk.name().to_string_lossy().into_owned(),
+            used_space: used,
+            total_space: total,
+        }
+    }).collect()
+}
 
