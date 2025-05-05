@@ -338,3 +338,79 @@ input[type="checkbox"] {
 td:last-child {
   text-align: center;
 }
+
+/* Theme toggle buttons styling for Light mode */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  color: #333333;
+}
+
+.theme-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn.active {
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn.dark,
+.theme-btn.light,
+.theme-btn.purple {
+  padding: 8px 12px;
+  background: none; 
+  border: none;
+  color: #333333;
+  font-weight: normal;
+  box-shadow: none;
+}
+
+.theme-btn.dark:hover,
+.theme-btn.light:hover,
+.theme-btn.purple:hover {
+  border: none;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn.active {
+  background-color: rgba(131, 57, 194, 0.15);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.app-title {
+  color: #8339c2; 
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
