@@ -596,13 +596,16 @@ table tbody tr.selected-row {
   display: flex;
   align-items: right;
   gap: 10px;
+  position: absolute;
+  right: 0;
+  top: 10;
 }
 .theme-toggle {
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  background-color: var(--color-theme-toggle-bg);
-  box-shadow: var(--color-theme-toggle-shadow);
+  /* background-color: var(--color-theme-toggle-bg);
+  box-shadow: var(--color-theme-toggle-shadow); */
 }
 .theme-btn {
   padding: 8px 12px;

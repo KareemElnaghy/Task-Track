@@ -62,7 +62,8 @@ export default function App() {
             Task Track
           </p>
         </div>
-        <div className="header-buttons" style={{ marginLeft: "80rem" }}>
+
+        <div className="header-buttons">
           <div className="theme-toggle">
             <button
               className={`theme-btn ${theme === "light" ? "active" : ""}`}
