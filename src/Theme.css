@@ -1,0 +1,764 @@
+
+/* Base variables */
+:root {
+  --transition-speed: 0.3s;
+  --animation-speed: 0.15s;
+  --border-radius: 8px;
+}
+
+/* Light theme */
+body.theme-light {
+  --bg-color: #f5f5f5;
+  --container-bg: #ffffff;
+  --text-color: #333333;
+  --title-color: #8339c2;
+  --header-color: #8339c2;
+  --primary-color: #8339c2;
+  --secondary-color: #f0f0f0;
+  --accent-color: #e9d8f0;
+  --hover-color: #e0e0e0;
+  --border-color: #e0e0e0;
+  --card-bg: #f9f5fc;
+  
+  --button-bg: #f2eef3;
+  --button-text: #333333;
+  --button-border: #e0e0e0;
+  --button-hover-border: #8339c2;
+  
+  --table-header-bg: #e9d8f0;
+  --table-header-text: #8339c2;
+  --table-row-even: #f9f5fc;
+  --table-row-odd: #ffffff;
+  --selected-row-bg: rgba(131, 57, 194, 0.1);
+  
+  --input-bg: #ffffff;
+  --input-text: #333333;
+  --input-border: #cccccc;
+  
+  --tab-bg: #f0f0f0;
+  --tab-active-bg: #e9d8f0;
+  --tab-active-text: inherit;
+  --tab-active-border: #8339c2;
+  
+  --context-menu-bg: #ffffff;
+  --context-menu-text: #333333;
+  --context-menu-border: #e0e0e0;
+  --context-menu-hover-bg: rgba(131, 57, 194, 0.1);
+  --context-menu-hover-text: #8339c2;
+  
+  --process-tree-border: #cccccc;
+  --process-tree-hover: rgba(0, 0, 0, 0.05);
+  --process-tree-selected: rgba(131, 57, 194, 0.1);
+  --pid-color: #8339c2;
+  
+  --toggle-bg: rgba(0, 0, 0, 0.05);
+  --toggle-shadow: rgba(0, 0, 0, 0.1);
+  --toggle-hover: rgba(0, 0, 0, 0.1);
+  --toggle-active: rgba(131, 57, 194, 0.15);
+  
+  /* Button variants */
+  --kill-bg: #ff6b6b;
+  --kill-border: #ff6b6b;
+  --kill-text: white;
+  
+  --suspend-bg: #ffd166;
+  --suspend-border: #ffd166;
+  --suspend-text: white;
+  
+  --resume-bg: #06d6a0;
+  --resume-border: #06d6a0;
+  --resume-text: white;
+}
+
+/* Dark theme */
+body.theme-dark {
+  --bg-color: #121212;
+  --container-bg: #1e1e1e;
+  --text-color: #e0e0e0;
+  --title-color: #ab6beb;
+  --header-color: #ab6beb;
+  --primary-color: #ab6beb;
+  --secondary-color: #2d2d2d;
+  --accent-color: #ab6beb;
+  --hover-color: #2d2d2d;
+  --border-color: #444;
+  --card-bg: #f9f5fc;
+  
+  --button-bg: #2d2d2d;
+  --button-text: #e0e0e0;
+  --button-border: #444;
+  --button-hover-border: #ab6beb;
+  
+  --table-header-bg: #2c2c2c;
+  --table-header-text: #ab6beb;
+  --table-row-even: #1a1a1a;
+  --table-row-odd: #232323;
+  --selected-row-bg: rgba(171, 107, 235, 0.3);
+  
+  --input-bg: #2d2d2d;
+  --input-text: #e0e0e0;
+  --input-border: #444;
+  
+  --tab-bg: #1a1a1a;
+  --tab-active-bg: #3d3d3d;
+  --tab-active-text: inherit;
+  --tab-active-border: #ab6beb;
+  
+  --context-menu-bg: #1a1a1a;
+  --context-menu-text: #e0e0e0;
+  --context-menu-border: #444;
+  --context-menu-hover-bg: rgba(171, 107, 235, 0.3);
+  --context-menu-hover-text: #ffffff;
+  
+  --process-tree-border: #555;
+  --process-tree-hover: rgba(255, 255, 255, 0.1);
+  --process-tree-selected: rgba(171, 107, 235, 0.3);
+  --pid-color: #ab6beb;
+  
+  --toggle-bg: rgba(255, 255, 255, 0.1);
+  --toggle-shadow: rgba(0, 0, 0, 0.25);
+  --toggle-hover: rgba(255, 255, 255, 0.15);
+  --toggle-active: rgba(171, 107, 235, 0.3);
+  
+  /* Button variants */
+  --kill-bg: #b32f2f;
+  --kill-border: #b32f2f;
+  --kill-text: white;
+  
+  --suspend-bg: #b38a2f;
+  --suspend-border: #b38a2f;
+  --suspend-text: white;
+  
+  --resume-bg: #2fb347;
+  --resume-border: #2fb347;
+  --resume-text: white;
+}
+
+/* Purple theme */
+body.theme-purple {
+  --bg-color: lavender;
+  --container-bg: #332b3c;
+  --text-color: #ffffff;
+  --title-color: #ecdcf2;
+  --header-color: #fffef1;
+  --primary-color: #ab6beb;
+  --secondary-color: #422d48;
+  --accent-color: #e2c0f0;
+  --hover-color: #e0e0e0;
+  --border-color: #e2c0f0;
+  --card-bg: #422d48;
+  
+  --button-bg: #e9d8f0;
+  --button-text: #1c0236;
+  --button-border: #e2c0f0;
+  --button-hover-border: #ab6beb;
+  
+  --table-header-bg: #76557b;
+  --table-header-text: #ffffff;
+  --table-row-even: #342537;
+  --table-row-odd: #422d48;
+  --selected-row-bg: #ab6beb33;
+  
+  --input-bg: #4d3756;
+  --input-text: #ffffff;
+  --input-border: #e2c0f0;
+  
+  --tab-bg: #332b3c;
+  --tab-active-bg: #e0bbf0;
+  --tab-active-text: inherit;
+  --tab-active-border: #ab6beb;
+  
+  --context-menu-bg: #232136;
+  --context-menu-text: #ececff;
+  --context-menu-border: #5d5b8d;
+  --context-menu-hover-bg: linear-gradient(90deg, #fff 0%, #f0f0f0 100%);
+  --context-menu-hover-text: #232136;
+  
+  --process-tree-border: #e2c0f0;
+  --process-tree-hover: rgba(171, 107, 235, 0.1);
+  --process-tree-selected: rgba(171, 107, 235, 0.3);
+  --pid-color: #e2c0f0;
+  
+  --toggle-bg: rgba(131, 57, 194, 0.1);
+  --toggle-shadow: rgba(131, 57, 194, 0.15);
+  --toggle-hover: rgba(131, 57, 194, 0.15);
+  --toggle-active: rgba(131, 57, 194, 0.25);
+  
+  /* Button variants */
+  --kill-bg: #f25d4d;
+  --kill-border: #f25d4d;
+  --kill-text: white;
+  
+  --suspend-bg: #f3c57b;
+  --suspend-border: #f3c57b;
+  --suspend-text: white;
+  
+  --resume-bg: #5be895;
+  --resume-border: #5be895;
+  --resume-text: white;
+}
+
+/* General styles */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.container {
+  background-color: var(--container-bg);
+  width: 100%;
+  transition: background-color var(--transition-speed);
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.start {
+  font-size: 20px;
+  padding: 15px 30px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 8px;
+  border: 2px solid var(--button-border);
+  cursor: pointer;
+}
+
+h1 {
+  text-align: center;
+  color: var(--title-color);
+}
+
+p {
+  text-align: center;
+  font-size: large;
+}
+
+h2 {
+  text-align: left;
+  font-size: small;
+  font-weight: lighter;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  transition: background-color var(--transition-speed);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  transition: background-color var(--transition-speed);
+}
+
+th {
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--table-row-even);
+}
+
+tbody tr:nth-child(odd) {
+  background-color: var(--table-row-odd);
+}
+
+/* search bar */
+.search-bar {
+  margin: 1rem 0;
+}
+
+.search-input {
+  width: 98%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  transition: border-color var(--transition-speed), background-color var(--transition-speed);
+}
+
+/* Buttons */
+button {
+  padding: 6px 6px;
+  margin-right: 7px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  border: 2px solid var(--button-border);
+  border-radius: 5px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  font-weight: bold;
+  cursor: pointer;
+  transition: border-color var(--transition-speed), background-color var(--transition-speed);
+}
+
+button.kill {
+  background-color: var(--kill-bg);
+  border: 2px solid var(--kill-border);
+  color: var(--kill-text);
+}
+
+button.suspend {
+  background-color: var(--suspend-bg);
+  border: 2px solid var(--suspend-border);
+  color: var(--suspend-text);
+}
+
+button.resume {
+  background-color: var(--resume-bg);
+  border: 2px solid var(--resume-border);
+  color: var(--resume-text);
+}
+
+button:hover {
+  border: 2px solid var(--button-hover-border);
+}
+
+/* tabs */
+.tabs {
+  display: flex;
+  background-color: var(--container-bg);
+  transition: background-color var(--transition-speed);
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: inherit;
+  background-color: var(--tab-bg);
+  transition: background-color var(--transition-speed);
+}
+
+.tab:hover {
+  background-color: var(--hover-color);
+}
+
+.tab.active {
+  background-color: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  border-bottom: 3px solid var(--tab-active-border);
+}
+
+/* resource tab */
+.resources {
+  padding: 1rem;
+  background-color: var(--secondary-color);
+  transition: background-color var(--transition-speed);
+}
+
+.resource-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.resource-row p {
+  width: 150px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.resource-row h2 {
+  width: 150px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.resource-box {
+  flex-grow: 1;
+  max-width: 1100px;
+  height: 300px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color var(--transition-speed);
+}
+
+.resource-pie {
+  flex-grow: 1;
+  max-width: 600px;
+  height: 600px;
+  background-color: var(--card-bg);
+  border-radius: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color var(--transition-speed);
+}
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 20px;
+  color: var(--table-header-text);
+}
+
+.process-header {
+  position: relative;
+  color: var(--table-header-text);
+}
+
+.sortable-header:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sort-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--table-header-text);
+}
+
+/* Styling the right click context menu */
+.context-menu {
+  position: absolute;
+  min-width: 180px;
+  background: var(--context-menu-bg);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
+  0 1.5px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--context-menu-border);
+  padding: 8px 0;
+  z-index: 1000;
+  animation: contextMenuFadeIn var(--animation-speed) ease;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  color: var(--context-menu-text);
+  font-size: 15px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background var(--animation-speed), color var(--animation-speed);
+  user-select: none;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 95%;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Process Tree Styling */
+.process-tree-view {
+  padding: 20px;
+  background-color: var(--container-bg);
+  transition: background-color var(--transition-speed);
+}
+
+.tree-node {
+  margin: 4px 0;
+  border-left: 1px solid var(--process-tree-border);
+  transition: border-color var(--transition-speed);
+}
+
+.node-content {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background var(--transition-speed);
+}
+
+.node-content:hover {
+  background: var(--process-tree-hover);
+}
+
+.node-content.selected {
+  background: var(--process-tree-selected);
+}
+
+.pid {
+  color: var(--pid-color);
+  font-family: monospace;
+  min-width: 60px;
+  transition: color var(--transition-speed);
+}
+
+.name {
+  color: var(--text-color);
+  transition: color var(--transition-speed);
+}
+
+.back-button {
+  background: none;
+  border: 1px solid var(--process-tree-border);
+  color: var(--text-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: border-color var(--transition-speed), color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.back-button:hover {
+  background: var(--process-tree-hover);
+}
+
+/* Process Table for selecting */
+table tbody tr.selected-row {
+  background-color: var(--selected-row-bg) !important;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: var(--context-menu-border);
+  margin: 6px 0;
+  transition: background-color var(--transition-speed);
+}
+
+.menu-item:hover,
+.menu-item:focus {
+  background: var(--context-menu-hover-bg);
+  color: var(--context-menu-hover-text);
+  border-radius: 6px;
+  margin: 0 8px;
+}
+
+/* dashboard resources */
+.dashboard-sections {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+  justify-content: space-between;
+  max-width: 1200px;
+}
+
+.dashboard-box {
+  flex: 0 0 48%; /* Each takes 48% of the row */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1rem;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dashboard p {
+  width: 150px;
+  font-weight: bolder;
+  font-size: large;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.dashboard h2 {
+  width: 150px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.disk-section {
+  flex: 1.5;
+  min-width: 350px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 500;
+  max-height: fit-content;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.disk-info {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color var(--transition-speed);
+}
+
+.disk-info strong {
+  color: var(--primary-color);
+  transition: color var(--transition-speed);
+}
+
+.side-by-side-boxes {
+  display: flex;
+  gap: 1rem; /* spacing between boxes */
+}
+
+.memory-box {
+  flex: 1; /* narrower box */
+  min-width: 200px;
+}
+
+.disk-section {
+  flex: 2; /* takes more space */
+}
+
+/* Theme toggle buttons styling */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--toggle-bg);
+  box-shadow: 0 2px 4px var(--toggle-shadow);
+  transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.theme-btn {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all var(--transition-speed) ease;
+  color: var(--text-color);
+}
+
+.theme-btn:hover {
+  background-color: var(--toggle-hover);
+}
+
+.theme-btn.active {
+  background-color: var(--toggle-active);
+  box-shadow: inset 0 0 5px var(--toggle-shadow);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--header-color);
+  transition: color var(--transition-speed);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 20px 20px;
+  margin-bottom: 5px;
+  transition: background-color var(--transition-speed);
+}
+
+/* Context menu hover submenu styling */
+.menu-item.has-submenu {
+  position: relative;
+  cursor: pointer;
+}
+
+.submenu-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 180px;
+  background: var(--context-menu-bg);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1.5px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--context-menu-border);
+  padding: 8px 0;
+  z-index: 1001;
+  animation: submenuFadeIn var(--animation-speed) ease;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+@keyframes submenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.priority-indicator {
+  display: inline-block;
+  width: 14px;
+  margin-right: 8px;
+  text-align: center;
+  transition: color var(--transition-speed);
+}
+
+.priority-indicator.normal {
+  color: var(--primary-color);
+}
+
+.priority-indicator.below {
+  color: var(--suspend-bg);
+}
+
+.priority-indicator.above {
+  color: var(--resume-bg);
+}
+
+.priority-low .priority-indicator {
+  color: var(--suspend-bg);
+}
+
+.priority-high .priority-indicator {
+  color: var(--resume-bg);
+}

@@ -7,15 +7,13 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { invoke } from "@tauri-apps/api/core";
-import { TbReload } from "react-icons/tb";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { BsCircleHalf } from "react-icons/bs";
 import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
 import ProcessTreeView from "./ProcessTreeView";
 import ProcessSubtreeView from "./ProcessSubtreeView";
-import "./Light.css"; // Default theme
+import "./Theme.css"; // Default theme
 
 const Navigation = () => {
   const location = useLocation();
@@ -46,38 +44,20 @@ const Navigation = () => {
 };
 
 export default function App() {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
 
   useEffect(() => {
-    switch (theme) {
-      case "dark":
-        import("./Dark.css");
-        break;
-      case "purple":
-        import("./Purple.css");
-        break;
-      case "light":
-        import("./Light.css");
-        break;
-      default:
-        import("./Purple.css");
-    }
+    // Remove all theme classes
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-purple');
+    
+    // Add the current theme class
+    document.body.classList.add(`theme-${theme}`);
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('theme', theme);
   }, [theme]);
-
-  // Fetch OS name on component mount
-  useEffect(() => {
-    const fetchOsName = async () => {
-      try {
-        const name = await invoke<string>("os_name");
-        setOSName(name);
-      } catch (error) {
-        console.error("Error fetching OS name:", error);
-        setOSName("Unknown OS");
-      }
-    };
-
-    fetchOsName();
-  }, []);
 
     return (
     <HashRouter>
