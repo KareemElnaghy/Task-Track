@@ -48,38 +48,6 @@ const Navigation = () => {
 };
 
 export default function App() {
-  // const [theme, setTheme] = useState("light");
-
-  // useEffect(() => {
-  //   switch (theme) {
-  //     case "dark":
-  //       import("./Dark.css");
-  //       break;
-  //     case "purple":
-  //       import("./Purple.css");
-  //       break;
-  //     case "light":
-  //       import("./Light.css");
-  //       break;
-  //     default:
-  //       import("./Purple.css");
-  //   }
-  // }, [theme]);
-
-  // // Fetch OS name on component mount
-  // useEffect(() => {
-  //   const fetchOsName = async () => {
-  //     try {
-  //       const name = await invoke<string>("os_name");
-  //       setOSName(name);
-  //     } catch (error) {
-  //       console.error("Error fetching OS name:", error);
-  //       setOSName("Unknown OS");
-  //     }
-  //   };
-
-  //   fetchOsName();
-  // }, []);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "purple"
   );

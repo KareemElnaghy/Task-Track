@@ -33,6 +33,7 @@ function ResourcesView() {
 
   const [coreFrequencies, setCoreFrequencies] = useState<number[]>([]);
   const [cpuTemperature, setCpuTemperature] = useState<number | null>(null);
+  const [clock, setClock] = useState<number | null>(null);
 
   //freq & temp
   useEffect(() => {
@@ -41,6 +42,8 @@ function ResourcesView() {
       if (!isMounted) return;
       const temp: number | null = await invoke("get_cpu_temperature");
       const frequencies: number[] = await invoke("get_cpu_frequencies");
+      const result: number | null = await invoke("get_cpu_clock");
+      setClock(result);
       setCpuTemperature(temp);
       setCoreFrequencies(frequencies);
     }, 1000);
@@ -275,10 +278,19 @@ function ResourcesView() {
               <strong>CPU:</strong>
               <h2>
                 <div>
-                  Temperature:{" "}
-                  {cpuTemperature !== null
-                    ? `${cpuTemperature.toFixed(1)}°C`
-                    : "N/A"}
+                  {clock !== null ? (
+                    <h2>CPU Clock: {clock} MHz</h2>
+                  ) : (
+                    <h2>Loading...</h2>
+                  )}
+                </div>
+                <div>
+                  <h2>
+                    Temperature:{" "}
+                    {cpuTemperature !== null
+                      ? `${cpuTemperature.toFixed(1)}°C`
+                      : "N/A"}
+                  </h2>
                 </div>
                 {coreFrequencies.map((freq, idx) => (
                   <div key={idx}>
@@ -286,7 +298,7 @@ function ResourcesView() {
                     {(
                       coreDataPoints[idx]?.[coreDataPoints[idx].length - 1] || 0
                     ).toFixed(1)}
-                    % @ {(freq / 1000).toFixed(1)} GHz
+                    %
                   </div>
                 ))}
               </h2>

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use sysinfo::Process;
-use sysinfo::{Disks,DiskUsage};
+use sysinfo::Disks;
 use std::{thread, time};
 use std::os::unix::ffi::OsStrExt; 
 
@@ -486,6 +486,11 @@ fn get_cpu_temperature() -> Option<f32> {
     }
     None
 }
+#[tauri::command]
+fn get_cpu_clock() -> Option<u64> {
+    let sys = SYS.lock().unwrap();
+    sys.cpus().first().map(|cpu| cpu.frequency())
+}
 
 
 
@@ -652,7 +657,7 @@ pub fn run() {
             resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
             get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,
             get_cached_memory_gb,get_cpu_frequencies,get_cpu_temperature,
-            set_process_priority,set_processes_priority])
+            set_process_priority,set_processes_priority,get_cpu_clock])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
