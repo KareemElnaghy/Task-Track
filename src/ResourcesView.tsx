@@ -32,7 +32,6 @@ function ResourcesView() {
   const [selectedCore, setSelectedCore] = useState<string>("avg");
 
   const [coreFrequencies, setCoreFrequencies] = useState<number[]>([]);
-  const [cpuTemperature, setCpuTemperature] = useState<number | null>(null);
   const [clock, setClock] = useState<number | null>(null);
 
   //freq & temp
@@ -40,11 +39,9 @@ function ResourcesView() {
     let isMounted = true;
     const interval = setInterval(async () => {
       if (!isMounted) return;
-      const temp: number | null = await invoke("get_cpu_temperature");
       const frequencies: number[] = await invoke("get_cpu_frequencies");
       const result: number | null = await invoke("get_cpu_clock");
       setClock(result);
-      setCpuTemperature(temp);
       setCoreFrequencies(frequencies);
     }, 1000);
     return () => clearInterval(interval);
@@ -237,7 +234,9 @@ function ResourcesView() {
               <button
                 onClick={() => setSelectedCore("avg")}
                 title="AVG Utilization"
-              ></button>
+              >
+                Average Utilization
+              </button>
 
               <div>
                 {coreDataPoints.map((_, idx) => (
@@ -283,14 +282,6 @@ function ResourcesView() {
                   ) : (
                     <h2>Loading...</h2>
                   )}
-                </div>
-                <div>
-                  <h2>
-                    Temperature:{" "}
-                    {cpuTemperature !== null
-                      ? `${cpuTemperature.toFixed(1)}°C`
-                      : "N/A"}
-                  </h2>
                 </div>
                 {coreFrequencies.map((freq, idx) => (
                   <div key={idx}>

@@ -477,16 +477,6 @@ fn get_cpu_frequencies() -> Vec<u64> {
 }
 
 #[tauri::command]
-fn get_cpu_temperature() -> Option<f32> {
-    let components = sysinfo::Components::new_with_refreshed_list();
-    for component in &components {
-        if component.label().to_lowercase().contains("cpu") {
-            return Some(component.temperature());
-        }
-    }
-    None
-}
-#[tauri::command]
 fn get_cpu_clock() -> Option<u64> {
     let sys = SYS.lock().unwrap();
     sys.cpus().first().map(|cpu| cpu.frequency())
@@ -656,7 +646,7 @@ pub fn run() {
             get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
             resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
             get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,
-            get_cached_memory_gb,get_cpu_frequencies,get_cpu_temperature,
+            get_cached_memory_gb,get_cpu_frequencies,
             set_process_priority,set_processes_priority,get_cpu_clock])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
