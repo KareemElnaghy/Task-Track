@@ -383,6 +383,7 @@ table tbody tr.selected-row {
   color: #312939;
   font-family: "Courier New", Courier, monospace;
   font-weight: 500;
+  max-height: fit-content;
 }
 
 .disk-info {

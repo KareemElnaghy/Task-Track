@@ -33,6 +33,22 @@ function ResourcesView() {
   const [coreDataPoints, setCoreDataPoints] = useState<number[][]>([]);
   const [selectedCore, setSelectedCore] = useState<string>("avg");
 
+  const [coreFrequencies, setCoreFrequencies] = useState<number[]>([]);
+  const [cpuTemperature, setCpuTemperature] = useState<number | null>(null);
+
+  //freq & temp
+  useEffect(() => {
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      if (!isMounted) return;
+      const temp: number | null = await invoke("get_cpu_temperature");
+      const frequencies: number[] = await invoke("get_cpu_frequencies");
+      setCpuTemperature(temp);
+      setCoreFrequencies(frequencies);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   // CPU UTILIZATION
   useEffect(() => {
     let isMounted = true;
@@ -109,7 +125,6 @@ function ResourcesView() {
 
   //MEMORY
   const [memoryGraphData, setMemoryGraphData] = useState<number[]>([]);
-
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
   const [memoryload, setMemoryload] = useState<number>(0);
   const [totalMemory, setTotalMemory] = useState<number>(0);
@@ -260,7 +275,23 @@ function ResourcesView() {
             </div>
             <div className="disk-info">
               <strong>CPU:</strong>
-              <h2>WILL GET</h2>
+              <h2>
+                <div>
+                  Temperature:{" "}
+                  {cpuTemperature !== null
+                    ? `${cpuTemperature.toFixed(1)}°C`
+                    : "N/A"}
+                </div>
+                {coreFrequencies.map((freq, idx) => (
+                  <div key={idx}>
+                    Core {idx + 1}:
+                    {(
+                      coreDataPoints[idx]?.[coreDataPoints[idx].length - 1] || 0
+                    ).toFixed(1)}
+                    % @ {(freq / 1000).toFixed(1)} GHz
+                  </div>
+                ))}
+              </h2>
             </div>
           </div>
           <div className="resource-row" style={{ marginBottom: "20rem" }}>

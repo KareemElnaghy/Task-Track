@@ -341,21 +341,7 @@ fn get_process_subtree(pid: u32) -> Option<ProcessTreeNode> {
     build_tree(Pid::from_u32(pid), &processes, &parent_map)
 }
 
-
-
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![os_name, get_processes, 
-            kill_process,suspend_process,resume_process, get_process_tree, 
-            get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
-            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
-            get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,get_cached_memory_gb])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
-
+// =========================Resources=============================
 static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
     let mut sys = System::new_all();
     sys.refresh_cpu_all(); // Initial refresh
@@ -484,33 +470,26 @@ fn get_cpu_utilization_per_core() -> Vec<f32> {
         .collect()
 }
 
-// // DISK usage
-// #[derive(serde::Serialize)]
-// struct diskthingies {
-//     name: String,
-//     used_space: u64,
-//     total_space: u64,
-// }
-// #[tauri::command]
-// fn get_disk_usage() -> Vec<diskthingies> {
-//     let disks = Disks::new_with_refreshed_list();
-//     disks.list().iter().map(|disk| {
-     
-//         let total = disk.total_space();
-//         let available = disk.available_space();
-//         let used = total - available;
-       
-        
+#[tauri::command]
+fn get_cpu_frequencies() -> Vec<u64> {
+    let sys = sysinfo::System::new_all();
+    sys.cpus().iter().map(|cpu| cpu.frequency()).collect()
+}
 
-//         diskthingies {
-//              name: disk.name().to_string_lossy().into_owned(),
-//             used_space: used,
-//             total_space: total,
-//         }
-//     }).collect()
-// }
+#[tauri::command]
+fn get_cpu_temperature() -> Option<f32> {
+    let components = sysinfo::Components::new_with_refreshed_list();
+    for component in &components {
+        if component.label().to_lowercase().contains("cpu") {
+            return Some(component.temperature());
+        }
+    }
+    None
+}
 
 
+
+//DISK
 #[derive(serde::Serialize)]
 struct DiskInfo {
     name: String,
@@ -556,3 +535,17 @@ fn get_disk_usage() -> Vec<DiskInfo> {
     }).collect()
 }
 
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![os_name, get_processes, 
+            kill_process,suspend_process,resume_process, get_process_tree, 
+            get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
+            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
+            get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,
+            get_cached_memory_gb,get_cpu_frequencies,get_cpu_temperature])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
