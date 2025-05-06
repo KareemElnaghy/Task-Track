@@ -9,11 +9,13 @@ import {
 } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { TbReload } from "react-icons/tb";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { BsCircleHalf } from "react-icons/bs";
 import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
 import ProcessTreeView from "./ProcessTreeView";
 import ProcessSubtreeView from "./ProcessSubtreeView";
-import "./App.css";
+import "./Light.css"; // Default theme
 
 const Navigation = () => {
   const location = useLocation();
@@ -44,7 +46,27 @@ const Navigation = () => {
 };
 
 export default function App() {
-  const [osName, setOSName] = useState("");
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme || "light";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    switch (theme) {
+      case "dark":
+        import("./Dark.css");
+        break;
+      case "purple":
+        import("./Purple.css");
+        break;
+      case "light":
+        import("./Light.css");
+        break;
+      default:
+        import("./Purple.css");
+    }
+  }, [theme]);
 
   // Fetch OS name on component mount
   useEffect(() => {
@@ -61,29 +83,40 @@ export default function App() {
     fetchOsName();
   }, []);
 
-  return (
+    return (
     <HashRouter>
       <main className="container">
-        {/* Header Section */}
         <div className="header">
-          <p className="os-name">Operating System: {osName || "Loading..."}</p>
-          <button
-            className="reload"
-            onClick={async () => {
-              try {
-                const name = await invoke<string>("os_name");
-                setOSName(name);
-              } catch (error) {
-                console.error("Error reloading OS name:", error);
-              }
-            }}
-          >
-            <TbReload />
-          </button>
+          <h1 className="app-title">Task Track</h1>
+          <div className="header-buttons">
+            <div className="theme-toggle">
+              <button
+                className={`theme-btn ${theme === "light" ? "active" : ""}`}
+                onClick={() => setTheme("light")}
+                title="Light Theme"
+              >
+                <MdLightMode />
+              </button>
+              <button
+                className={`theme-btn ${theme === "dark" ? "active" : ""}`}
+                onClick={() => setTheme("dark")}
+                title="Dark Theme"
+              >
+                <MdDarkMode />
+              </button>
+              <button
+                className={`theme-btn ${theme === "purple" ? "active" : ""}`}
+                onClick={() => setTheme("purple")}
+                title="Purple Theme"
+              >
+                <BsCircleHalf />
+              </button>
+            </div>
+          </div>
         </div>
-
+  
         <Navigation />
-
+  
         <Routes>
           <Route path="/processes" element={<ProcessesView />} />
           <Route path="/resources" element={<ResourcesView />} />

@@ -10,11 +10,13 @@ body {
   background-color: #332b3c;
   width: 100%;
 }
+
 .row {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
 }
+
 .start {
   font-size: 20px;
   padding: 15px 30px;
@@ -49,17 +51,15 @@ table {
   margin-top: 1rem;
 }
 
-th,
-td {
+th, td {
   padding: 10px;
   text-align: left;
 }
 
 th {
-  background-color: #563b5a;
   background-color: #76557b;
 }
-/* Sticky header */
+
 thead th {
   position: sticky;
   top: 0;
@@ -73,18 +73,20 @@ tbody tr:nth-child(even) {
 tbody tr:nth-child(odd) {
   background-color: #422d48;
 }
+
 /* search bar */
 .search-bar {
   margin: 1rem 0;
-  background-color: #fffef1;
 }
 
 .search-input {
   width: 98%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid #e2c0f0;
   border-radius: 6px;
   font-size: 1rem;
+  background-color: #4d3756;
+  color: #ffffff;
 }
 
 /* Buttons */
@@ -101,6 +103,7 @@ button {
   border: 2px solid #e2c0f0;
   cursor: pointer;
 }
+
 button.kill {
   background-color: #f25d4d;
   border: 2px solid #f25d4d;
@@ -122,10 +125,11 @@ button.resume {
 button:hover {
   border: 2px solid #ab6beb;
 }
-/*tabs*/
+
+/* tabs */
 .tabs {
   display: flex;
-  background-color: #312939;
+  background-color: #332b3c;
 }
 
 .tab {
@@ -189,15 +193,30 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.resource-pie {
+  flex-grow: 1;
+  max-width: 600px;
+  height: 600px;
+  background-color: #f0f0f0;
+  border-radius: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .sortable-header {
   cursor: pointer;
   user-select: none;
   position: relative;
-  padding-right: 20px; /* Space for the sort icon */
+  padding-right: 20px;
+  color: white;
 }
 
 .process-header {
   position: relative;
+  color: white;
 }
 
 .sortable-header:hover {
@@ -209,6 +228,7 @@ button:hover {
   right: 5px;
   top: 50%;
   transform: translateY(-50%);
+  color: white;
 }
 
 /* Styling the right click context menu */
@@ -218,7 +238,7 @@ button:hover {
   background: #232136;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
-    0 1.5px 6px rgba(100, 100, 255, 0.06);
+  0 1.5px 6px rgba(100, 100, 255, 0.06);
   border: 1px solid #5d5b8d;
   padding: 8px 0;
   z-index: 1000;
@@ -246,26 +266,20 @@ button:hover {
   border: none;
   background: none;
   text-align: left;
-  width: 100%;
+  width: 95%;
   outline: none;
+  box-sizing: border-box;
 }
 
-/* .context-menu:hover,
-.context-menuitem {
-  background-color: #e0e0e0;
-  color: inherit;
-} */
-
 /* Process Tree Styling */
-
-/* App.css */
 .process-tree-view {
   padding: 20px;
+  background-color: #332b3c;
 }
 
 .tree-node {
   margin: 4px 0;
-  border-left: 1px solid #4a4a4a;
+  border-left: 1px solid #e2c0f0;
 }
 
 .node-content {
@@ -277,27 +291,27 @@ button:hover {
 }
 
 .node-content:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(171, 107, 235, 0.1);
 }
 
 .node-content.selected {
-  background: rgba(171, 107, 235, 0.15);
+  background: rgba(171, 107, 235, 0.3);
 }
 
 .pid {
-  color: #ab6beb;
+  color: #e2c0f0;
   font-family: monospace;
   min-width: 60px;
 }
 
 .name {
-  color: #ececff;
+  color: #ffffff;
 }
 
 .back-button {
   background: none;
-  border: 1px solid #5d5b8d;
-  color: #ececff;
+  border: 1px solid #e2c0f0;
+  color: #ffffff;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -305,7 +319,7 @@ button:hover {
 }
 
 .back-button:hover {
-  background: rgba(93, 91, 141, 0.3);
+  background: rgba(171, 107, 235, 0.2);
 }
 
 /* Process Table for selecting */
@@ -319,21 +333,6 @@ table tbody tr.selected-row {
   margin: 6px 0;
 }
 
-.menu-item {
-  color: #ececff;
-  font-size: 15px;
-  padding: 10px 24px;
-  cursor: pointer;
-  user-select: none;
-  border: none;
-  background: none;
-  text-align: left;
-  width: 95%;
-  outline: none;
-  box-sizing: border-box;
-  transition: background 0.15s, color 0.15s;
-}
-
 .menu-item:hover,
 .menu-item:focus {
   background: linear-gradient(90deg, #fff 0%, #f0f0f0 100%);
@@ -341,6 +340,7 @@ table tbody tr.selected-row {
   border-radius: 6px;
   margin: 0 8px;
 }
+
 /* dashboard resources */
 .dashboard-sections {
   display: flex;
@@ -409,4 +409,56 @@ table tbody tr.selected-row {
 
 .disk-section {
   flex: 2; /* takes more space */
+}
+
+/* Theme toggle buttons styling */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(131, 57, 194, 0.1);
+  box-shadow: 0 2px 4px rgba(131, 57, 194, 0.15);
+}
+
+.theme-btn {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  color: inherit;
+}
+
+.theme-btn:hover {
+  background-color: rgba(131, 57, 194, 0.15);
+}
+
+.theme-btn.active {
+  background-color: rgba(131, 57, 194, 0.25);
+  box-shadow: inset 0 0 5px rgba(131, 57, 194, 0.1);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #fffef1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 20px 20px;
+  margin-bottom: 5px;
 }

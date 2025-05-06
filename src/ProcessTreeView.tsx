@@ -41,9 +41,6 @@ export default function ProcessTreeView() {
 
   return (
     <div className="process-tree-view">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        &larr; Back to Processes
-      </button>
       <h2>Process Hierarchy</h2>
       {tree.map(root => (
         <TreeNode key={root.pid} node={root} />

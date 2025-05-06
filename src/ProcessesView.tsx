@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { TbSortAscending, TbSortDescending } from "react-icons/tb";
 import { invoke } from "@tauri-apps/api/core";
 import { useNavigate } from "react-router-dom";
-import "./App.css";
 
 interface Process {
   pid: string;

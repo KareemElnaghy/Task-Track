@@ -1,0 +1,417 @@
+/* General styles */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #e0e0e0;
+  background-color: #121212;
+}
+
+.container {
+  background-color: #1e1e1e;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.start {
+  font-size: 20px;
+  padding: 15px 30px;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 8px;
+  border: 2px solid #3d3d3d;
+  cursor: pointer;
+}
+
+h1 {
+  text-align: center;
+  color: #ab6beb;
+}
+
+p {
+  text-align: center;
+  font-size: large;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #2c2c2c;
+  color: #ab6beb;
+}
+
+/* Sticky header */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #1a1a1a;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #232323;
+}
+
+/* search bar */
+.search-bar {
+  margin: 1rem 0;
+}
+
+.search-input {
+  width: 98%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+/* Buttons */
+button {
+  padding: 6px 6px;
+  margin-right: 7px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  border: 2px solid;
+  border-radius: 5px;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  font-weight: bold;
+  border: 2px solid #444;
+  cursor: pointer;
+}
+
+button.kill {
+  background-color: #b32f2f;
+  border: 2px solid #b32f2f;
+  color: white;
+}
+
+button.suspend {
+  background-color: #b38a2f;
+  border: 2px solid #b38a2f;
+  color: white;
+}
+
+button.resume {
+  background-color: #2fb347;
+  border: 2px solid #2fb347;
+  color: white;
+}
+
+button:hover {
+  border: 2px solid #ab6beb;
+}
+
+/*tabs*/
+.tabs {
+  display: flex;
+  background-color: #1a1a1a;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tab:hover {
+  background-color: #2d2d2d;
+}
+
+.tab.active {
+  background-color: #3d3d3d;
+  border-bottom: 3px solid #ab6beb;
+}
+
+/* resource tab */
+.resources {
+  padding: 1rem;
+  background-color: #1e1e1e;
+}
+
+.resource-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.resource-row p {
+  width: 150px;
+  font-weight: bold;
+  margin: 0;
+  color: #e0e0e0;
+}
+
+.resource-box {
+  flex-grow: 1;
+  max-width: 1100px;
+  height: 300px;
+  background-color: #2d2d2d;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.resource-pie {
+  flex-grow: 1;
+  max-width: 600px;
+  height: 600px;
+  background-color: #2d2d2d;
+  border-radius: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 20px;
+}
+
+.process-header {
+  position: relative;
+}
+
+.sortable-header:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sort-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ab6beb;
+}
+
+/* Styling the right click context menu */
+.context-menu {
+  position: absolute;
+  min-width: 180px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+    0 1.5px 6px rgba(171, 107, 235, 0.2);
+  border: 1px solid #444;
+  padding: 8px 0;
+  z-index: 1000;
+  animation: contextMenuFadeIn 0.15s ease;
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  color: #e0e0e0;
+  font-size: 15px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 95%;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Process Tree Styling */
+.process-tree-view {
+  padding: 20px;
+  background-color: #1e1e1e;
+}
+
+.tree-node {
+  margin: 4px 0;
+  border-left: 1px solid #555;
+}
+
+.node-content {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.node-content:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.node-content.selected {
+  background: rgba(171, 107, 235, 0.3);
+}
+
+.pid {
+  color: #ab6beb;
+  font-family: monospace;
+  min-width: 60px;
+}
+
+.name {
+  color: #e0e0e0;
+}
+
+.back-button {
+  background: none;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: rgba(171, 107, 235, 0.2);
+}
+
+/* Process Table for selecting */
+table tbody tr.selected-row {
+  background-color: rgba(171, 107, 235, 0.3) !important;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: #444;
+  margin: 6px 0;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+  background: rgba(171, 107, 235, 0.3);
+  color: #ffffff;
+  border-radius: 6px;
+  margin: 0 8px;
+}
+
+/* Dark mode checkbox styling */
+input[type="checkbox"] {
+  accent-color: #ab6beb;
+  width: 16px;
+  height: 16px;
+}
+
+/* Center checkboxes */
+td:last-child {
+  text-align: center;
+}
+
+/* Theme toggle buttons styling for Dark mode */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.theme-btn {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  color: #e0e0e0;
+}
+
+.theme-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-btn.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Add this to ensure theme buttons don't inherit general button styling */
+.theme-btn.dark,
+.theme-btn.light,
+.theme-btn.purple {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  font-weight: normal;
+  box-shadow: none;
+}
+
+.theme-btn.dark:hover,
+.theme-btn.light:hover,
+.theme-btn.purple:hover {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-btn.active {
+  background-color: rgba(171, 107, 235, 0.3);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.app-title {
+  color: #ab6beb;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}

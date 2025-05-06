@@ -1,5 +1,3 @@
-// ResourcesView.tsx
-import "./App.css";
 import { useState, useEffect, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Line } from "react-chartjs-2";
