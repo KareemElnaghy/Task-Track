@@ -46,13 +46,9 @@ const Navigation = () => {
 };
 
 export default function App() {
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem("theme");
-    return savedTheme || "light";
-  });
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
     switch (theme) {
       case "dark":
         import("./Dark.css");

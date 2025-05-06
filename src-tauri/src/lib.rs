@@ -535,6 +535,112 @@ fn get_disk_usage() -> Vec<DiskInfo> {
     }).collect()
 }
 
+// Priority Commands
+
+#[tauri::command]
+fn set_process_priority(pid: u32, priority_level: String) -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        // Convert priority level to nice value for macOS
+        let nice_value = match priority_level.to_lowercase().as_str() {
+            "low" => 10,              // Low priority
+            "below_normal" => 5,      // Below normal
+            "normal" => 0,            // Normal (default)
+            "above_normal" => -5,     // Above normal
+            "high" => -10,            // High
+            _ => return false,        // Invalid priority level
+        };
+        
+        // On macOS, we use 'renice' to change priority of already running processes
+        let output = Command::new("renice")
+            .args(&[
+                &nice_value.to_string(), 
+                "-p", 
+                &pid.to_string()
+            ])
+            .output();
+            
+        match output {
+            Ok(output) => output.status.success(),
+            Err(_) => false
+        }
+    }
+    
+    #[cfg(target_os = "linux")]
+    {
+        // Convert priority level to nice value for Linux
+        let nice_value = match priority_level.to_lowercase().as_str() {
+            "low" => 10,
+            "below_normal" => 5,
+            "normal" => 0,
+            "above_normal" => -5,
+            "high" => -10,
+            _ => return false,
+        };
+        
+        // On Linux, for running processes we also use 'renice'
+        let output = Command::new("renice")
+            .args(&[
+                &nice_value.to_string(), 
+                "-p", 
+                &pid.to_string()
+            ])
+            .output();
+            
+        match output {
+            Ok(output) => output.status.success(),
+            Err(_) => false
+        }
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        // Windows has different priority classes
+        let priority_class = match priority_level.to_lowercase().as_str() {
+            "low" => "IDLE_PRIORITY_CLASS",
+            "below_normal" => "BELOW_NORMAL_PRIORITY_CLASS",
+            "normal" => "NORMAL_PRIORITY_CLASS",
+            "above_normal" => "ABOVE_NORMAL_PRIORITY_CLASS",
+            "high" => "HIGH_PRIORITY_CLASS",
+            _ => return false,
+        };
+        
+        // On Windows, use wmic to set priority
+        let output = Command::new("wmic")
+            .args(&[
+                "process", 
+                "where", 
+                &format!("ProcessId={}", pid),
+                "call", 
+                "setpriority", 
+                priority_class
+            ])
+            .output();
+            
+        match output {
+            Ok(output) => output.status.success(),
+            Err(_) => false
+        }
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+    {
+        false // Unsupported OS
+    }
+}
+
+// for group operation on processes
+#[tauri::command]
+fn set_processes_priority(pids: Vec<u32>, priority_level: String) -> Vec<(u32, bool)> {
+    let mut results = Vec::new();
+    
+    for pid in pids {
+        let success = set_process_priority(pid, priority_level.clone());
+        results.push((pid, success));
+    }
+    
+    results
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -545,7 +651,8 @@ pub fn run() {
             get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
             resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
             get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,
-            get_cached_memory_gb,get_cpu_frequencies,get_cpu_temperature])
+            get_cached_memory_gb,get_cpu_frequencies,get_cpu_temperature,
+            set_process_priority,set_processes_priority])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -31,6 +31,7 @@ export default function ProcessesView() {
     y: 0,
     selectedPid: null,
   });
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const navigate = useNavigate();
   const tableRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -182,6 +183,7 @@ export default function ProcessesView() {
       </div>
 
       {/* Right Click Context Menu */}
+      {/* Options for Group Actions, Process Tree, and Priority */}
       {contextMenu.visible && (
         <div
           ref={contextMenuRef}
@@ -197,7 +199,119 @@ export default function ProcessesView() {
             View Process Tree
           </div>
 
-          {selectedProcesses.length > 0 && (
+          {/* Show single process priority menu only if no multiple selections */}
+          {selectedProcesses.length <= 1 && (
+            <>
+              <div className="menu-separator"></div>
+              <div
+                className="menu-item has-submenu"
+                onMouseEnter={() => setActiveSubmenu("priority")}
+                onMouseLeave={(e) => {
+                  const submenu = document.querySelector(".submenu");
+                  if (submenu && !submenu.contains(e.relatedTarget as Node)) {
+                    setActiveSubmenu(null);
+                  }
+                }}
+              >
+                Set Priority
+                <span className="submenu-arrow">▶</span>
+                {activeSubmenu === "priority" && (
+                  <div
+                    className="submenu priority-submenu"
+                    onMouseEnter={() => setActiveSubmenu("priority")}
+                    onMouseLeave={() => setActiveSubmenu(null)}
+                  >
+                    <div
+                      className="menu-item priority-item priority-high"
+                      onClick={() => {
+                        invoke("set_process_priority", {
+                          pid: parseInt(contextMenu.selectedPid!),
+                          priorityLevel: "high",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator">▲</span> High
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        invoke("set_process_priority", {
+                          pid: parseInt(contextMenu.selectedPid!),
+                          priorityLevel: "above_normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator above">▲</span> Above
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        invoke("set_process_priority", {
+                          pid: parseInt(contextMenu.selectedPid!),
+                          priorityLevel: "normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator normal">●</span>{" "}
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        invoke("set_process_priority", {
+                          pid: parseInt(contextMenu.selectedPid!),
+                          priorityLevel: "below_normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator below">▼</span> Below
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item priority-low"
+                      onClick={() => {
+                        invoke("set_process_priority", {
+                          pid: parseInt(contextMenu.selectedPid!),
+                          priorityLevel: "low",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator">▼</span> Low
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Group actions for selected processes */}
+          {selectedProcesses.length > 1 && (
             <>
               <div className="menu-separator"></div>
               <div
@@ -218,6 +332,136 @@ export default function ProcessesView() {
               >
                 Resume Selected ({selectedProcesses.length})
               </div>
+
+              {/* Bulk priority submenu with reordered options */}
+              <div
+                className="menu-item has-submenu"
+                onMouseEnter={() => setActiveSubmenu("bulkPriority")}
+                onMouseLeave={(e) => {
+                  const submenu = document.querySelector(
+                    ".submenu.bulk-priority"
+                  );
+                  if (submenu && !submenu.contains(e.relatedTarget as Node)) {
+                    setActiveSubmenu(null);
+                  }
+                }}
+              >
+                Set Priority for Selected
+                <span className="submenu-arrow">▶</span>
+                {activeSubmenu === "bulkPriority" && (
+                  <div
+                    className="submenu bulk-priority"
+                    onMouseEnter={() => setActiveSubmenu("bulkPriority")}
+                    onMouseLeave={() => setActiveSubmenu(null)}
+                  >
+                    <div
+                      className="menu-item priority-item priority-high"
+                      onClick={() => {
+                        if (selectedProcesses.length === 0) return;
+                        const pids = selectedProcesses.map((pid) =>
+                          parseInt(pid)
+                        );
+                        invoke("set_processes_priority", {
+                          pids,
+                          priorityLevel: "high",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator">▲</span> High
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        if (selectedProcesses.length === 0) return;
+                        const pids = selectedProcesses.map((pid) =>
+                          parseInt(pid)
+                        );
+                        invoke("set_processes_priority", {
+                          pids,
+                          priorityLevel: "above_normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator above">▲</span> Above
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        if (selectedProcesses.length === 0) return;
+                        const pids = selectedProcesses.map((pid) =>
+                          parseInt(pid)
+                        );
+                        invoke("set_processes_priority", {
+                          pids,
+                          priorityLevel: "normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator normal">●</span>{" "}
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item"
+                      onClick={() => {
+                        if (selectedProcesses.length === 0) return;
+                        const pids = selectedProcesses.map((pid) =>
+                          parseInt(pid)
+                        );
+                        invoke("set_processes_priority", {
+                          pids,
+                          priorityLevel: "below_normal",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator below">▼</span> Below
+                      Normal
+                    </div>
+                    <div
+                      className="menu-item priority-item priority-low"
+                      onClick={() => {
+                        if (selectedProcesses.length === 0) return;
+                        const pids = selectedProcesses.map((pid) =>
+                          parseInt(pid)
+                        );
+                        invoke("set_processes_priority", {
+                          pids,
+                          priorityLevel: "low",
+                        }).then(() => {
+                          setContextMenu((prev) => ({
+                            ...prev,
+                            visible: false,
+                          }));
+                        });
+                      }}
+                    >
+                      <span className="priority-indicator">▼</span> Low
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="menu-separator"></div>
               <div
                 className="menu-item"
                 onClick={() => setSelectedProcesses([])}
