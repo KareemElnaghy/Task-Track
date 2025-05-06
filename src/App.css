@@ -79,7 +79,7 @@
   --color-tab-hover-bg: #2d2d2d;
   --color-tab-active-bg: #3d3d3d;
   --color-tab-active-border: #ab6beb;
-  --color-btn-bg: #2d2d2d;
+  --color-btn-bg: #453f45;
   --color-btn-text: #e0e0e0;
   --color-btn-border: #444;
   --color-btn-hover-border: #ab6beb;
@@ -121,8 +121,8 @@
   --color-dashboard-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   --color-dashboard-p-text: #e0e0e0;
   --color-dashboard-h2-text: #e0e0e0;
-  --color-disk-section-bg: #232136;
-  --color-disk-section-text: #ab6beb;
+  --color-disk-section-bg: #453f45;
+  --color-disk-section-text: #fcfbfd;
   --color-disk-info-bg: #232323;
   --color-disk-info-shadow: #ab6beb33;
   --color-disk-info-strong: #ff6384;
