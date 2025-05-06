@@ -205,7 +205,10 @@ function ResourcesView() {
   const [disks, setDisks] = useState<DiskThingy[]>([]);
 
   useEffect(() => {
-    invoke<DiskThingy[]>("get_disk_usage").then(setDisks);
+    const interval = setInterval(() => {
+      invoke<DiskThingy[]>("get_disk_usage").then(setDisks);
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -244,6 +247,9 @@ function ResourcesView() {
         </div>
 
         <div className="dashboard-sections side-by-side-boxes">
+          <div className="resource-row" style={{ marginBottom: "20rem" }}>
+            <p>Stats Summary:</p>
+          </div>
           <div className="dashboard-box disk-section">
             <div className="disk-info">
               <strong>Physical Memory:</strong>
@@ -257,9 +263,7 @@ function ResourcesView() {
               <h2>WILL GET</h2>
             </div>
           </div>
-
-          {/* Right: Disk Box (with "Disk" label above) */}
-          <div className="resource-row">
+          <div className="resource-row" style={{ marginBottom: "20rem" }}>
             <p>Disk Usage:</p>
           </div>
           <div className="dashboard-box disk-section">
