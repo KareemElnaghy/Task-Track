@@ -36,6 +36,12 @@ p {
   font-size: large;
 }
 
+h2 {
+  text-align: left;
+  font-size: small;
+  font-weight: lighter;
+}
+
 /* Table styling */
 table {
   width: 100%;
@@ -160,25 +166,22 @@ button:hover {
   margin: 0;
   color: #fff;
 }
+.resource-row h2 {
+  width: 150px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+  color: #fff;
+}
 
 .resource-box {
   flex-grow: 1;
   max-width: 1100px;
-  height: 300px; /* Increased from 180px or 220px */
+  height: 300px;
   background-color: #f0f0f0;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-.resource-pie {
-  flex-grow: 1;
-  max-width: 600px;
-  height: 600px; /* Increased from 180px or 220px */
-  background-color: #f0f0f0;
-  border-radius: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,4 +340,71 @@ table tbody tr.selected-row {
   color: #232136;
   border-radius: 6px;
   margin: 0 8px;
+}
+/* dashboard resources */
+.dashboard-sections {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem 0;
+  justify-content: space-between;
+}
+
+.dashboard-box {
+  flex: 0 0 48%; /* Each takes 48% of the row */
+  background: rgb(240, 240, 240);
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(30, 40, 90, 0.04);
+  margin-bottom: 1rem;
+}
+
+.dashboard p {
+  width: 150px;
+  font-weight: bolder;
+  font-size: large;
+  margin: 0;
+  color: #fff;
+}
+.dashboard h2 {
+  width: 150px;
+  margin: 0;
+  padding-top: 5px;
+  padding-left: 5px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+  color: #fff;
+}
+.disk-section {
+  flex: 1.5;
+  min-width: 350px;
+  background-color: rgba(63, 46, 70, 0.192);
+  color: #312939;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 500;
+}
+
+.disk-info {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: rgb(240, 240, 240);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px #ab6beb33;
+}
+
+.disk-info strong {
+  color: rgb(255, 99, 132);
+}
+.side-by-side-boxes {
+  display: flex;
+  gap: 1rem; /* spacing between boxes */
+}
+
+.memory-box {
+  flex: 1; /* narrower box */
+  min-width: 200px;
+}
+
+.disk-section {
+  flex: 2; /* takes more space */
 }

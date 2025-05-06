@@ -3,7 +3,7 @@ import "./App.css";
 import { useState, useEffect, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Line } from "react-chartjs-2";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +13,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
 } from "chart.js";
 
 ChartJS.register(
@@ -20,13 +21,13 @@ ChartJS.register(
   LinearScale,
   LineElement,
   PointElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
 );
 
 function ResourcesView() {
-  const [memoryGraphData, setMemoryGraphData] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const [coreDataPoints, setCoreDataPoints] = useState<number[][]>([]);
@@ -107,12 +108,50 @@ function ResourcesView() {
   };
 
   //MEMORY
+  const [memoryGraphData, setMemoryGraphData] = useState<number[]>([]);
+
+  const [memoryUsage, setMemoryUsage] = useState<number>(0);
+  const [memoryload, setMemoryload] = useState<number>(0);
+  const [totalMemory, setTotalMemory] = useState<number>(0);
+  const [freeMemory, setFreeMemory] = useState<number>(0);
+  const [swapMemoryUsage, setSwapMemoryUsage] = useState<number>(0);
+  const [cachedmem, setCachedmem] = useState<number>(0);
+  const [cachedFiles, setCachedFiles] = useState<number | null>(null);
+
+  const fetchMemoryData = async () => {
+    try {
+      const usedMemory = await invoke("get_memory_usage_gb");
+      const totalMem = await invoke("get_total_memory_gb");
+      const freeMem = await invoke("get_free_memory_gb");
+      const swapUsage = await invoke("get_swap_memory_usage_gb");
+      const cached = await invoke("get_cached_memory_gb");
+
+      setMemoryUsage(usedMemory as number);
+      setTotalMemory(totalMem as number);
+      setFreeMemory(freeMem as number);
+      setSwapMemoryUsage(swapUsage as number);
+      setCachedFiles(cached as number);
+    } catch (error) {
+      console.error("Error fetching memory data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchMemoryData();
+    const interval = setInterval(() => {
+      fetchMemoryData();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     const interval = setInterval(async () => {
       if (!isMounted) return;
-      const memoryUsage = (await invoke("get_memory_usage_gb")) as number;
-      setMemoryGraphData((prevData) => [...prevData, memoryUsage]);
+      const memoryload =
+        (((await invoke("get_memory_usage_gb")) as number) /
+          ((await invoke("get_total_memory_gb")) as number)) *
+        100;
+      setMemoryGraphData((prevData) => [...prevData, memoryload]);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -126,7 +165,7 @@ function ResourcesView() {
     }),
     datasets: [
       {
-        label: "Memory Usage GB",
+        label: "Memory Load (%)",
         data: memoryGraphData,
         borderColor: "rgb(255, 99, 132)",
         // borderColor: "#89648f",
@@ -143,7 +182,7 @@ function ResourcesView() {
       y: {
         suggestedMin: Math.min(...memoryGraphData) - 1,
         suggestedMax: Math.max(...memoryGraphData) + 1,
-        title: { display: true, text: "GB" },
+        title: { display: true, text: "Load (%)" },
       },
       x: {
         title: { display: true, text: "Time (s)" },
@@ -154,8 +193,13 @@ function ResourcesView() {
   // DISK
   type DiskThingy = {
     name: string;
-    used_space: number;
-    total_space: number;
+    mount_point: string;
+    fs_type: string;
+    is_root: boolean;
+    is_swap: boolean;
+    used_gb: number;
+    free_gb: number;
+    total_gb: number;
   };
 
   const [disks, setDisks] = useState<DiskThingy[]>([]);
@@ -176,43 +220,65 @@ function ResourcesView() {
                 title="AVG Utilization"
               ></button>
             </div>
-            <div>
-              {coreDataPoints.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedCore(idx.toString())}
-                >
-                  Core {idx + 1}
-                </button>
-              ))}
-            </div>
           </p>
-          <div className="resource-box">
+          <div
+            className="resource-box"
+            style={{ marginLeft: "3.3rem", marginTop: "3rem" }}
+          >
             <Line data={CPUchart} options={CPUchartoptions} />
+          </div>
+
+          <div>
+            {coreDataPoints.map((_, idx) => (
+              <button key={idx} onClick={() => setSelectedCore(idx.toString())}>
+                Core {idx + 1}
+              </button>
+            ))}
           </div>
         </div>
         <div className="resource-row">
           <p>Memory Usage:</p>
-
           <div className="resource-box">
             <Line data={memChartData} options={memchartOptions} />
           </div>
         </div>
-        <div className="resource-row">
-          <p>Disk Usage:</p>
-          <div></div>
-          <div className="resource-box">
+
+        <div className="dashboard-sections side-by-side-boxes">
+          <div className="dashboard-box disk-section">
+            <div className="disk-info">
+              <strong>Physical Memory:</strong>
+              <h2>Total Memory: {totalMemory?.toFixed(2)} GB</h2>
+              <h2>Used Memory: {memoryUsage?.toFixed(2)} GB</h2>
+              <h2>Swap Memory Used: {swapMemoryUsage?.toFixed(2)} GB </h2>
+              <h2>Cached files: {cachedFiles?.toFixed(2)} GB </h2>
+            </div>
+            <div className="disk-info">
+              <strong>CPU:</strong>
+              <h2>WILL GET</h2>
+            </div>
+          </div>
+
+          {/* Right: Disk Box (with "Disk" label above) */}
+          <div className="resource-row">
+            <p>Disk Usage:</p>
+          </div>
+          <div className="dashboard-box disk-section">
             {disks.length === 0 ? (
               <p>Loading disk info...</p>
             ) : (
-              <ul>
-                {disks.map((disk, idx) => (
-                  <li key={idx}>
-                    <strong>{disk.name}</strong>: Used {disk.used_space} / Total{" "}
-                    {disk.total_space} bytes
-                  </li>
-                ))}
-              </ul>
+              disks.map((disk, idx) => (
+                <div className="disk-info" key={idx}>
+                  <strong>
+                    {disk.is_root ? "Root" : disk.is_swap ? "Swap" : "Data"}:
+                  </strong>{" "}
+                  {disk.name}
+                  <div>Mount Point: {disk.mount_point}</div>
+                  <div>File System: {disk.fs_type}</div>
+                  <div>Total: {disk.total_gb.toFixed(2)} GB</div>
+                  <div>Used: {disk.used_gb.toFixed(2)} GB</div>
+                  <div>Free: {disk.free_gb.toFixed(2)} GB</div>
+                </div>
+              ))
             )}
           </div>
         </div>

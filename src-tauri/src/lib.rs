@@ -8,6 +8,7 @@ use once_cell::sync::Lazy;
 use sysinfo::Process;
 use sysinfo::{Disks,DiskUsage};
 use std::{thread, time};
+use std::os::unix::ffi::OsStrExt; 
 
 #[derive(Serialize, Deserialize)]
 struct ProcessInfo { // struct to hold process information
@@ -349,18 +350,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![os_name, get_processes, 
             kill_process,suspend_process,resume_process, get_process_tree, 
             get_process_subtree, get_memory_usage_gb, kill_processes, suspend_processes, 
-            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage])
+            resume_processes,get_cpu_utilization,get_cpu_utilization_per_core,get_disk_usage,
+            get_total_memory_gb,get_free_memory_gb, get_swap_memory_usage_gb,get_cached_memory_gb])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-
-// get memory usage in gb
-#[tauri::command]
-fn get_memory_usage_gb() -> f32 {
-    let mut sys = System::new_all();
-    sys.refresh_memory();
-    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
 }
 
 static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
@@ -368,6 +361,100 @@ static SYS: Lazy<Mutex<System>> = Lazy::new(|| {
     sys.refresh_cpu_all(); // Initial refresh
     Mutex::new(sys)
 });
+// MEMORY USAGE
+// get memory usage in gb
+#[tauri::command]
+fn get_memory_usage_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.used_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+}
+// #[tauri::command]
+// fn get_memory_load() -> f32 {
+//     let mut sys = System::new_all();
+//     sys.refresh_memory();
+//     ((sys.used_memory() as f32 / sys.total_memory() as f32) * 100.0 as f32)
+// }
+
+//get total memory in gb
+//Includes: Used + Free + Buffers + Cached memory.
+#[tauri::command]
+fn get_total_memory_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.total_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+}
+// get free memory in gb
+//Excludes memory used for caching/buffering.
+#[tauri::command]   
+fn get_free_memory_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.free_memory() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+}
+// get swap memory usage in gb
+//swap space in use 
+//Swap: Disk space used as "overflow" memory when RAM is full.
+#[tauri::command]
+fn get_swap_memory_usage_gb() -> f32 {
+    let mut sys = System::new_all();
+    sys.refresh_memory();
+    sys.used_swap() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+}
+// // get swap total memory in gb
+// //Total swap space available
+// #[tauri::command]
+// fn get_swap_total_memory_gb() -> f32 {
+//     let mut sys = System::new_all();
+//     sys.refresh_memory();
+//     sys.total_swap() as f32 / 1024.0 / 1024.0 / 1024.0 // Convert to GB
+// }
+#[tauri::command]
+fn get_cached_memory_gb() -> f32 {
+    #[cfg(target_os = "linux")]
+    {
+        use std::fs;
+        if let Ok(meminfo) = fs::read_to_string("/proc/meminfo") {
+            for line in meminfo.lines() {
+                if line.starts_with("Cached:") {
+                    let parts: Vec<&str> = line.split_whitespace().collect();
+                    if let Ok(kb) = parts[1].parse::<f32>() {
+                        return kb / 1024.0 / 1024.0; // KB to GB
+                    }
+                }
+            }
+        }
+        0.0
+    }
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let output = Command::new("vm_stat")
+            .output()
+            .expect("Failed to execute vm_stat");
+        let output_str = String::from_utf8_lossy(&output.stdout);
+        
+        for line in output_str.lines() {
+            if line.starts_with("File-backed pages") {
+                let pages: f32 = line.split_whitespace()
+                    .nth(2)
+                    .and_then(|s| s.trim().parse().ok())
+                    .unwrap_or(0.0);
+                // Convert pages to GB (1 page = 4096 bytes)
+                return (pages * 4096.0) / 1024.0 / 1024.0 / 1024.0;
+            }
+        }
+        0.0
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    {
+        0.0 // Placeholder for other OS
+    }
+}
+
+
+
+//CPU Utilization
 // get cpu utilization
 #[tauri::command]
 fn get_cpu_utilization() -> f32 {
@@ -397,36 +484,74 @@ fn get_cpu_utilization_per_core() -> Vec<f32> {
         .collect()
 }
 
+// // DISK usage
+// #[derive(serde::Serialize)]
+// struct diskthingies {
+//     name: String,
+//     used_space: u64,
+//     total_space: u64,
+// }
 // #[tauri::command]
-// fn get_disk_usage() -> Vec<u64> {
+// fn get_disk_usage() -> Vec<diskthingies> {
 //     let disks = Disks::new_with_refreshed_list();
 //     disks.list().iter().map(|disk| {
+     
 //         let total = disk.total_space();
 //         let available = disk.available_space();
-//         total - available
-//     }).collect()
-// }
-#[derive(serde::Serialize)]
-struct diskthingies {
-    name: String,
-    used_space: u64,
-    total_space: u64,
-}
-#[tauri::command]
-fn get_disk_usage() -> Vec<diskthingies> {
-    let disks = Disks::new_with_refreshed_list();
-    disks.list().iter().map(|disk| {
-     
-        let total = disk.total_space();
-        let available = disk.available_space();
-        let used = total - available;
+//         let used = total - available;
        
         
 
-        diskthingies {
-             name: disk.name().to_string_lossy().into_owned(),
-            used_space: used,
-            total_space: total,
+//         diskthingies {
+//              name: disk.name().to_string_lossy().into_owned(),
+//             used_space: used,
+//             total_space: total,
+//         }
+//     }).collect()
+// }
+
+
+#[derive(serde::Serialize)]
+struct DiskInfo {
+    name: String,
+    mount_point: String,
+    fs_type: String,
+    is_root: bool,
+    is_swap: bool,
+    used_gb: f64,
+    free_gb: f64,
+    total_gb: f64,
+}
+
+fn bytes_to_gb(bytes: u64) -> f64 {
+    bytes as f64 / 1024.0 / 1024.0 / 1024.0
+}
+
+#[tauri::command]
+fn get_disk_usage() -> Vec<DiskInfo> {
+    let disks = Disks::new_with_refreshed_list();
+    disks.list().iter().map(|disk| {
+        let total = disk.total_space();
+        let available = disk.available_space();
+        let used = total - available;
+
+        let mount_point = disk.mount_point().to_string_lossy().into_owned();
+        let is_root = mount_point == "/";
+
+        // Convert file_system OsStr to String for display and matching
+        let fs_bytes = disk.file_system().as_bytes();
+        let fs_type = String::from_utf8_lossy(fs_bytes).to_string();
+        let is_swap = fs_type.to_lowercase().contains("swap");
+
+        DiskInfo {
+            name: disk.name().to_string_lossy().into_owned(),
+            mount_point,
+            fs_type,
+            is_root,
+            is_swap,
+            used_gb: bytes_to_gb(used),
+            free_gb: bytes_to_gb(available),
+            total_gb: bytes_to_gb(total),
         }
     }).collect()
 }
