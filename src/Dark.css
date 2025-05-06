@@ -1,9 +1,10 @@
+/*DARK THEME */
 /* General styles */
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #e0e0e0;
-  background-color: #121212;
+  background-color: #1e1e1e;
 }
 
 .container {
@@ -350,8 +351,6 @@ td:last-child {
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .theme-btn {
@@ -403,15 +402,14 @@ td:last-child {
   margin: 0;
   font-size: 28px;
   font-weight: 600;
-}
-
-.app-title {
+  text-align: center;
   color: #ab6beb;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 10px 20px;
+  border-top: 15px solid #ab6beb;
 }

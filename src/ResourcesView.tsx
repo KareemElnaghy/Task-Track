@@ -235,21 +235,21 @@ function ResourcesView() {
                 onClick={() => setSelectedCore("avg")}
                 title="AVG Utilization"
               ></button>
+
+              <div>
+                {coreDataPoints.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedCore(idx.toString())}
+                  >
+                    Core {idx + 1}
+                  </button>
+                ))}
+              </div>
             </div>
           </p>
-          <div
-            className="resource-box"
-            style={{ marginLeft: "3.3rem", marginTop: "3rem" }}
-          >
+          <div className="resource-box" style={{ marginTop: "3rem" }}>
             <Line data={CPUchart} options={CPUchartoptions} />
-          </div>
-
-          <div>
-            {coreDataPoints.map((_, idx) => (
-              <button key={idx} onClick={() => setSelectedCore(idx.toString())}>
-                Core {idx + 1}
-              </button>
-            ))}
           </div>
         </div>
         <div className="resource-row">

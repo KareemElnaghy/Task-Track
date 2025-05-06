@@ -1,9 +1,10 @@
+/* LIGHT THEME */
 /* General styles */
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #333333;
-  background-color: #f5f5f5;
+  background-color: lavender;
 }
 
 .container {
@@ -350,8 +351,6 @@ td:last-child {
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .theme-btn {
@@ -380,7 +379,7 @@ td:last-child {
 .theme-btn.light,
 .theme-btn.purple {
   padding: 8px 12px;
-  background: none; 
+  background: none;
   border: none;
   color: #333333;
   font-weight: normal;
@@ -402,15 +401,13 @@ td:last-child {
   margin: 0;
   font-size: 28px;
   font-weight: 600;
-}
-
-.app-title {
-  color: #8339c2; 
+  color: #8339c2;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 10px 20px;
+  border-top: 15px solid #8339c2;
 }

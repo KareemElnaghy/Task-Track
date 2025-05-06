@@ -15,7 +15,9 @@ import ProcessesView from "./ProcessesView";
 import ResourcesView from "./ResourcesView";
 import ProcessTreeView from "./ProcessTreeView";
 import ProcessSubtreeView from "./ProcessSubtreeView";
-import "./Light.css"; // Default theme
+// import App.css
+
+import "./App.css";
 
 const Navigation = () => {
   const location = useLocation();
@@ -46,73 +48,82 @@ const Navigation = () => {
 };
 
 export default function App() {
-  const [theme, setTheme] = useState("light");
+  // const [theme, setTheme] = useState("light");
 
+  // useEffect(() => {
+  //   switch (theme) {
+  //     case "dark":
+  //       import("./Dark.css");
+  //       break;
+  //     case "purple":
+  //       import("./Purple.css");
+  //       break;
+  //     case "light":
+  //       import("./Light.css");
+  //       break;
+  //     default:
+  //       import("./Purple.css");
+  //   }
+  // }, [theme]);
+
+  // // Fetch OS name on component mount
+  // useEffect(() => {
+  //   const fetchOsName = async () => {
+  //     try {
+  //       const name = await invoke<string>("os_name");
+  //       setOSName(name);
+  //     } catch (error) {
+  //       console.error("Error fetching OS name:", error);
+  //       setOSName("Unknown OS");
+  //     }
+  //   };
+
+  //   fetchOsName();
+  // }, []);
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "purple"
+  );
   useEffect(() => {
-    switch (theme) {
-      case "dark":
-        import("./Dark.css");
-        break;
-      case "purple":
-        import("./Purple.css");
-        break;
-      case "light":
-        import("./Light.css");
-        break;
-      default:
-        import("./Purple.css");
-    }
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Fetch OS name on component mount
-  useEffect(() => {
-    const fetchOsName = async () => {
-      try {
-        const name = await invoke<string>("os_name");
-        setOSName(name);
-      } catch (error) {
-        console.error("Error fetching OS name:", error);
-        setOSName("Unknown OS");
-      }
-    };
-
-    fetchOsName();
-  }, []);
-
-    return (
+  return (
     <HashRouter>
       <main className="container">
         <div className="header">
-          <h1 className="app-title">Task Track</h1>
-          <div className="header-buttons">
-            <div className="theme-toggle">
-              <button
-                className={`theme-btn ${theme === "light" ? "active" : ""}`}
-                onClick={() => setTheme("light")}
-                title="Light Theme"
-              >
-                <MdLightMode />
-              </button>
-              <button
-                className={`theme-btn ${theme === "dark" ? "active" : ""}`}
-                onClick={() => setTheme("dark")}
-                title="Dark Theme"
-              >
-                <MdDarkMode />
-              </button>
-              <button
-                className={`theme-btn ${theme === "purple" ? "active" : ""}`}
-                onClick={() => setTheme("purple")}
-                title="Purple Theme"
-              >
-                <BsCircleHalf />
-              </button>
-            </div>
+          <p className="app-title " style={{ marginTop: "2rem" }}>
+            Task Track
+          </p>
+        </div>
+        <div className="header-buttons" style={{ marginLeft: "80rem" }}>
+          <div className="theme-toggle">
+            <button
+              className={`theme-btn ${theme === "light" ? "active" : ""}`}
+              onClick={() => setTheme("light")}
+              title="Light Theme"
+            >
+              <MdLightMode />
+            </button>
+            <button
+              className={`theme-btn ${theme === "dark" ? "active" : ""}`}
+              onClick={() => setTheme("dark")}
+              title="Dark Theme"
+            >
+              <MdDarkMode />
+            </button>
+            <button
+              className={`theme-btn ${theme === "purple" ? "active" : ""}`}
+              onClick={() => setTheme("purple")}
+              title="Purple Theme"
+            >
+              <BsCircleHalf />
+            </button>
           </div>
         </div>
-  
+
         <Navigation />
-  
+
         <Routes>
           <Route path="/processes" element={<ProcessesView />} />
           <Route path="/resources" element={<ResourcesView />} />
