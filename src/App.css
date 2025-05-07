@@ -34,7 +34,7 @@
     0 1.5px 6px rgba(100, 100, 255, 0.06);
   --color-context-menu-item: #ececff;
   --color-menu-separator: #5d5b8d;
-  --color-menu-item-hover-bg: linear-gradient(90deg, #fff 0%, #f0f0f0 100%);
+  --color-menu-item-hover-bg: #6c556c;
   --color-menu-item-hover-text: #232136;
   --color-process-tree-bg: #332b3c;
   --color-tree-node-border: #e2c0f0;
@@ -63,7 +63,7 @@
   --color-theme-btn-active-shadow: inset 0 0 5px rgba(131, 57, 194, 0.1);
   --color-app-title: #fffef1;
   --color-header-border: lavender;
-  --color-priority-indicator-normal: #e2c0f0;
+  --color-priority-indicator-normal: #120119;
   --color-priority-indicator-below: #f3c57b;
   --color-priority-indicator-above: #5be895;
 }
